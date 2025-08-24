@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import CarValuationForm from "@/components/car-valuation-form";
-import ValuationResults from "@/components/valuation-results";
+import CarValuationForm from "../components/car-valuation-form";
+import ValuationResults from "../components/valuation-results";
 import type { ValuationResponse } from "@shared/schema";
 
 export default function Home() {
@@ -57,7 +57,7 @@ export default function Home() {
           <div className="mt-6 flex items-center justify-center space-x-8 text-sm text-text-secondary">
             <div className="flex items-center space-x-2">
               <i className="fas fa-database text-primary"></i>
-              <span>Edmunds API Integration</span>
+              <span>MarketCheck API Integration</span>
             </div>
             <div className="flex items-center space-x-2">
               <i className="fas fa-chart-line text-accent"></i>
@@ -127,7 +127,7 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-gray-600 mt-8 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2024 CarValue Pro. All rights reserved. Powered by Edmunds API.</p>
+            <p>&copy; 2024 CarValue Pro. All rights reserved. Powered by MarketCheck API.</p>
           </div>
         </div>
       </footer>

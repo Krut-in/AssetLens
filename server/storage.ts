@@ -52,8 +52,15 @@ export class MemStorage implements IStorage {
   async createValuationResult(insertResult: InsertValuationResult): Promise<ValuationResult> {
     const id = randomUUID();
     const result: ValuationResult = {
-      ...insertResult,
       id,
+      requestId: insertResult.requestId || null,
+      tradeInValue: insertResult.tradeInValue || null,
+      privatePartyValue: insertResult.privatePartyValue || null,
+      retailValue: insertResult.retailValue || null,
+      loanAmount: insertResult.loanAmount || null,
+      ltvRatio: insertResult.ltvRatio || null,
+      estimatedRate: insertResult.estimatedRate || null,
+      monthlyPayment: insertResult.monthlyPayment || null,
       createdAt: new Date(),
     };
     this.valuationResults.set(id, result);

@@ -18,7 +18,7 @@ export default function ValuationResults({ data, isLoading }: ValuationResultsPr
                 <i className="fas fa-spinner fa-spin text-primary text-xl"></i>
               </div>
               <h3 className="text-lg font-semibold text-secondary mb-2">Analyzing Your Vehicle</h3>
-              <p className="text-text-secondary mb-4">Getting real-time market data from Edmunds...</p>
+              <p className="text-text-secondary mb-4">Getting real-time market data from MarketCheck...</p>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div className="bg-gradient-to-r from-primary to-blue-600 h-2 rounded-full animate-pulse" style={{ width: '75%' }}></div>
               </div>
@@ -47,7 +47,7 @@ export default function ValuationResults({ data, isLoading }: ValuationResultsPr
     );
   }
 
-  const formatCurrency = (value: string | undefined) => {
+  const formatCurrency = (value: string | null | undefined) => {
     if (!value) return "$0";
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -56,7 +56,7 @@ export default function ValuationResults({ data, isLoading }: ValuationResultsPr
     }).format(parseFloat(value));
   };
 
-  const formatPercentage = (value: string | undefined) => {
+  const formatPercentage = (value: string | null | undefined) => {
     if (!value) return "0%";
     return `${parseFloat(value).toFixed(1)}%`;
   };
@@ -102,7 +102,7 @@ export default function ValuationResults({ data, isLoading }: ValuationResultsPr
             <h3 className="text-xl font-semibold text-secondary">True Market Value™</h3>
             <div className="flex items-center space-x-2 text-sm text-text-secondary">
               <i className="fas fa-database text-primary"></i>
-              <span>Powered by Edmunds</span>
+              <span>Powered by MarketCheck</span>
             </div>
           </div>
 
@@ -234,7 +234,7 @@ export default function ValuationResults({ data, isLoading }: ValuationResultsPr
               <i className="fas fa-users text-primary text-lg"></i>
               <div>
                 <p className="font-medium text-secondary">Professional Grade Analysis</p>
-                <p className="text-sm text-text-secondary">Using industry-standard Edmunds True Market Value™ data</p>
+                <p className="text-sm text-text-secondary">Using real-time MarketCheck automotive data from 84,000+ listings</p>
               </div>
             </div>
             <div className="flex items-center space-x-3 p-3 bg-orange-50 rounded-lg border border-orange-200">
