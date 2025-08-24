@@ -46,3 +46,49 @@ Thumbs.db
 # Temporary folders
 tmp/
 temp/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/
+dev.db
+sessions.db
+
+# Media and recordings
+*.mp4
+*.m4a
+*.mov
+*.avi
+*.mkv
+*.webm
+Zoom Recording/
+recordings/
+
+# Downloaded resources and attachments
+downloadedResources/
+attached_assets/
+*.pdf
+
+# Editor and IDE files
+*.swp
+*.swo
+*~
+.vscode/settings.json
+.idea/
+*.sublime-*
+
+# Cache directories
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+
+# Test coverage
+.nyc_output/
+coverage/
+
+# Misc
+.DS_Store*
+*.tgz
+*.tar.gz
