@@ -60,6 +60,14 @@ export default function Home() {
                     Assessment
                   </Button>
                 </Link>
+                <Link href="/dashboard">
+                  <Button
+                    variant="ghost"
+                    className="text-foreground hover:text-primary"
+                  >
+                    <i className="fas fa-chart-bar mr-2"></i>Dashboard
+                  </Button>
+                </Link>
               </nav>
               <div className="hidden lg:flex items-center space-x-6">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">

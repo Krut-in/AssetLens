@@ -1,64 +1,88 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, decimal, timestamp } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+// Users table for Google OAuth
+export const users = sqliteTable("users", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: text("email").notNull().unique(),
+  name: text("name").notNull(),
+  image: text("image"),
+  googleId: text("google_id").unique(),
+  createdAt: integer("created_at", { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
-export const valuationRequests = pgTable("valuation_requests", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+// User assets management table
+export const userAssets = sqliteTable("user_assets", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id").references(() => users.id).notNull(),
+  assetType: text("asset_type").notNull(), // 'vehicle' or 'property'
+  assetId: text("asset_id").notNull(), // references either valuation_requests or land_assessment_requests
+  customName: text("custom_name"), // user-defined name for the asset
+  createdAt: integer("created_at", { mode: 'timestamp' }).$defaultFn(() => new Date()),
+});
+
+export const valuationRequests = sqliteTable("valuation_requests", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id").references(() => users.id),
   make: text("make").notNull(),
   model: text("model").notNull(),
   year: integer("year").notNull(),
   mileage: integer("mileage").notNull(),
   zipCode: text("zip_code").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
-export const valuationResults = pgTable("valuation_results", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  requestId: varchar("request_id").references(() => valuationRequests.id),
-  tradeInValue: decimal("trade_in_value", { precision: 10, scale: 2 }),
-  privatePartyValue: decimal("private_party_value", { precision: 10, scale: 2 }),
-  retailValue: decimal("retail_value", { precision: 10, scale: 2 }),
-  loanAmount: decimal("loan_amount", { precision: 10, scale: 2 }),
-  ltvRatio: decimal("ltv_ratio", { precision: 5, scale: 2 }),
-  estimatedRate: decimal("estimated_rate", { precision: 5, scale: 2 }),
-  monthlyPayment: decimal("monthly_payment", { precision: 10, scale: 2 }),
-  createdAt: timestamp("created_at").defaultNow(),
+export const valuationResults = sqliteTable("valuation_results", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  requestId: text("request_id").references(() => valuationRequests.id),
+  tradeInValue: real("trade_in_value"),
+  privatePartyValue: real("private_party_value"),
+  retailValue: real("retail_value"),
+  loanAmount: real("loan_amount"),
+  ltvRatio: real("ltv_ratio"),
+  estimatedRate: real("estimated_rate"),
+  monthlyPayment: real("monthly_payment"),
+  createdAt: integer("created_at", { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
-export const landAssessmentRequests = pgTable("land_assessment_requests", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+export const landAssessmentRequests = sqliteTable("land_assessment_requests", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id").references(() => users.id),
   streetAddress: text("street_address").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
   zipCode: text("zip_code"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
-export const landAssessmentResults = pgTable("land_assessment_results", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  requestId: varchar("request_id").references(() => landAssessmentRequests.id),
-  assessedValue: decimal("assessed_value", { precision: 12, scale: 2 }),
-  marketValue: decimal("market_value", { precision: 12, scale: 2 }),
-  landValue: decimal("land_value", { precision: 12, scale: 2 }),
-  improvementValue: decimal("improvement_value", { precision: 12, scale: 2 }),
+export const landAssessmentResults = sqliteTable("land_assessment_results", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  requestId: text("request_id").references(() => landAssessmentRequests.id),
+  assessedValue: real("assessed_value"),
+  marketValue: real("market_value"),
+  landValue: real("land_value"),
+  improvementValue: real("improvement_value"),
   propertyType: text("property_type"),
-  lotSize: decimal("lot_size", { precision: 10, scale: 2 }),
+  lotSize: real("lot_size"),
   yearBuilt: integer("year_built"),
   ownerName: text("owner_name"),
   apn: text("apn"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: 'timestamp' }).$defaultFn(() => new Date()),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+  email: true,
+  name: true,
+  image: true,
+  googleId: true,
+});
+
+export const insertUserAssetSchema = createInsertSchema(userAssets).omit({
+  id: true,
+  createdAt: true,
 });
 
 export const insertValuationRequestSchema = createInsertSchema(valuationRequests).omit({
@@ -83,6 +107,8 @@ export const insertLandAssessmentResultSchema = createInsertSchema(landAssessmen
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+export type UserAsset = typeof userAssets.$inferSelect;
+export type InsertUserAsset = z.infer<typeof insertUserAssetSchema>;
 export type ValuationRequest = typeof valuationRequests.$inferSelect;
 export type InsertValuationRequest = z.infer<typeof insertValuationRequestSchema>;
 export type ValuationResult = typeof valuationResults.$inferSelect;
@@ -117,4 +143,23 @@ export type LandAssessmentResponse = {
   reportInfo: {
     date: string;
   };
+};
+
+// Combined asset types for dashboard
+export type AssetSummary = {
+  id: string;
+  type: 'vehicle' | 'property';
+  name: string;
+  summary: string;
+  value: string;
+  createdAt: Date;
+  details: ValuationResponse | LandAssessmentResponse;
+};
+
+export type UserDashboard = {
+  user: User;
+  assets: AssetSummary[];
+  totalValue: string;
+  vehicleCount: number;
+  propertyCount: number;
 };
