@@ -99,7 +99,7 @@ export default function ValuationResults({
             <h3 className="text-xl font-semibold text-secondary">
               Vehicle Summary
             </h3>
-            <div className="bg-accent/10 px-3 py-1 rounded-full">
+            <div className="bg-gray-100 px-3 py-1 rounded-full">
               <span className="text-accent font-medium text-sm">
                 <i className="fas fa-check-circle mr-1"></i>Verified
               </span>
@@ -147,13 +147,13 @@ export default function ValuationResults({
       </Card>
 
       {/* True Market Value Display */}
-      <Card className="rounded-2xl shadow-lg border border-gray-100">
+      <Card className="rounded-2xl shadow-lg border border-border bg-card">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-secondary">
+            <h3 className="text-xl font-semibold text-foreground">
               True Market Value™
             </h3>
-            <div className="flex items-center space-x-2 text-sm text-text-secondary">
+            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               <i className="fas fa-database text-primary"></i>
               <span>Powered by MarketCheck</span>
             </div>
@@ -161,13 +161,13 @@ export default function ValuationResults({
 
           <div className="grid gap-4">
             {/* Trade-in Value */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
+            <div className="bg-primary-subtle p-4 rounded-xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-secondary mb-1">
+                  <p className="font-medium text-foreground mb-1">
                     Trade-in Value
                   </p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-muted-foreground">
                     What dealers typically pay
                   </p>
                 </div>
@@ -183,19 +183,19 @@ export default function ValuationResults({
             </div>
 
             {/* Private Party Value */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
+            <div className="bg-secondary-subtle p-4 rounded-xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-secondary mb-1">
+                  <p className="font-medium text-foreground mb-1">
                     Private Party Value
                   </p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-muted-foreground">
                     Selling to another individual
                   </p>
                 </div>
                 <div className="text-right">
                   <p
-                    className="text-2xl font-bold text-accent"
+                    className="text-2xl font-bold text-secondary"
                     data-testid="text-privateparty-value"
                   >
                     {formatCurrency(data.result.privatePartyValue)}
@@ -205,13 +205,13 @@ export default function ValuationResults({
             </div>
 
             {/* Retail Value */}
-            <div className="bg-gradient-to-r from-orange-50 to-amber-50 p-4 rounded-xl border border-orange-100">
+            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-secondary mb-1">
+                  <p className="font-medium text-foreground mb-1">
                     Retail Value
                   </p>
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-sm text-muted-foreground">
                     Dealer selling price
                   </p>
                 </div>
@@ -236,7 +236,7 @@ export default function ValuationResults({
             <h3 className="text-xl font-semibold text-secondary">
               Loan Analysis
             </h3>
-            <div className="bg-primary/10 px-3 py-1 rounded-full">
+            <div className="bg-blue-100 px-3 py-1 rounded-full">
               <span className="text-primary font-medium text-sm">
                 <i className="fas fa-calculator mr-1"></i>LTV Calculated
               </span>
@@ -244,7 +244,7 @@ export default function ValuationResults({
           </div>
 
           {/* Loan Amount Display */}
-          <div className="bg-gradient-to-r from-primary to-blue-600 text-white p-6 rounded-xl mb-6">
+          <div className="bg-primary text-primary-foreground p-6 rounded-xl mb-6">
             <div className="text-center">
               <p className="text-blue-100 mb-2">Estimated Loan Amount</p>
               <p
@@ -370,7 +370,7 @@ export default function ValuationResults({
       {/* Action Buttons */}
       <div className="flex gap-4">
         <Button
-          className="flex-1 bg-gradient-to-r from-accent to-emerald-600 text-white py-3 px-6 rounded-xl font-semibold shadow-lg hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 transform hover:scale-[1.02]"
+          className="flex-1 bg-secondary text-secondary-foreground py-3 px-6 rounded-xl font-semibold shadow-lg hover:opacity-90 transition-all duration-200 transform hover:scale-[1.02]"
           onClick={() => window.print()}
           data-testid="button-download-report"
         >

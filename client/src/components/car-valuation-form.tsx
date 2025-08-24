@@ -222,7 +222,7 @@ export default function CarValuationForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-calendar-alt mr-2 icon-secondary-blue"></i>
+                    <i className="fas fa-calendar-alt mr-2 text-foreground"></i>
                     Year
                   </FormLabel>
                   <FormControl>
@@ -232,7 +232,7 @@ export default function CarValuationForm({
                       data-testid="select-year"
                     >
                       <SelectTrigger className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground">
-                        <SelectValue placeholder="Select Year" />
+                        <SelectValue placeholder="Select vehicle year" />
                       </SelectTrigger>
                       <SelectContent>
                         {years.map(year => (
@@ -289,7 +289,7 @@ export default function CarValuationForm({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-map-marker-alt mr-2 icon-secondary-blue"></i>
+                    <i className="fas fa-map-marker-alt mr-2 text-foreground"></i>
                     ZIP Code
                   </FormLabel>
                   <FormControl>
@@ -314,7 +314,7 @@ export default function CarValuationForm({
             <Button
               type="submit"
               disabled={valuationMutation.isPending}
-              className="btn-success-green w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-submit-valuation"
             >
               <i className="fas fa-car mr-3 icon-success"></i>
@@ -329,9 +329,9 @@ export default function CarValuationForm({
             </Button>
 
             {/* Disclaimer */}
-            <div className="bg-blue-subtle rounded-xl p-4">
+            <div className="bg-primary-subtle rounded-xl p-4">
               <div className="flex items-start space-x-3">
-                <i className="fas fa-info-circle icon-secondary-blue mt-0.5"></i>
+                <i className="fas fa-info-circle icon-primary mt-0.5"></i>
                 <div className="text-sm text-muted-foreground">
                   <p className="font-medium text-foreground mb-1">
                     Clean Vehicle Assumption

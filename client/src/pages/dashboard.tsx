@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import CombinedReport from "@/components/combined-report";
+import ThemeToggle from "@/components/theme-toggle";
 import type { UserDashboard } from "@shared/schema";
 
 export default function Dashboard() {
@@ -56,7 +57,7 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
             <i className="fas fa-spinner fa-spin text-primary text-xl"></i>
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -80,7 +81,10 @@ export default function Dashboard() {
       <header className="bg-card shadow-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <Link
+              href="/"
+              className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+            >
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                 <i className="fas fa-chart-bar text-primary-foreground text-lg"></i>
               </div>
@@ -92,18 +96,47 @@ export default function Dashboard() {
                   Welcome back, {dashboard.user.name}
                 </p>
               </div>
-            </div>
+            </Link>
             <div className="flex items-center space-x-4">
-              <Link href="/">
-                <Button variant="ghost">
-                  <i className="fas fa-car mr-2"></i>Add Vehicle
-                </Button>
-              </Link>
-              <Link href="/land-assessment">
-                <Button variant="ghost">
-                  <i className="fas fa-home mr-2"></i>Add Property
-                </Button>
-              </Link>
+              {/* Navigation */}
+              <nav className="hidden md:flex items-center space-x-4">
+                <Link href="/">
+                  <Button
+                    variant="ghost"
+                    className="text-foreground hover:text-primary"
+                  >
+                    <i className="fas fa-car mr-2"></i>Vehicle Valuation
+                  </Button>
+                </Link>
+                <Link href="/land-assessment">
+                  <Button
+                    variant="ghost"
+                    className="text-foreground hover:text-primary"
+                  >
+                    <i className="fas fa-map-marked-alt mr-2"></i>Land
+                    Assessment
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button
+                    variant="ghost"
+                    className="text-foreground hover:text-primary"
+                  >
+                    <i className="fas fa-chart-bar mr-2"></i>Dashboard
+                  </Button>
+                </Link>
+              </nav>
+              <div className="hidden lg:flex items-center space-x-6">
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <i className="fas fa-shield-alt text-secondary"></i>
+                  <span>Secure & Trusted</span>
+                </div>
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <i className="fas fa-chart-line text-primary"></i>
+                  <span>Real-time Data</span>
+                </div>
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </div>
@@ -196,7 +229,7 @@ export default function Dashboard() {
           <CardContent>
             {dashboard.assets.length === 0 ? (
               <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-muted/20 rounded-full mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
                   <i className="fas fa-plus text-muted-foreground text-xl"></i>
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">
