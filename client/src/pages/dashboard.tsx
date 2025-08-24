@@ -291,70 +291,65 @@ export default function Dashboard() {
       {/* Main Dashboard */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Total Portfolio Value Card */}
+          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
                 Total Portfolio Value
               </CardTitle>
-              <i className="fas fa-dollar-sign text-muted-foreground"></i>
+              <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                <i className="fas fa-dollar-sign text-primary text-sm"></i>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">
+            <CardContent className="pt-0">
+              <div className="text-2xl font-bold text-primary mb-1">
                 {dashboard.totalValue}
               </div>
               <p className="text-xs text-muted-foreground">
-                {dashboard.assets.length} total assets
+                {dashboard.assets.length} total asset
+                {dashboard.assets.length !== 1 ? "s" : ""}
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Vehicles</CardTitle>
-              <i className="fas fa-car text-muted-foreground"></i>
+          {/* Vehicles Card */}
+          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Vehicles
+              </CardTitle>
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <i className="fas fa-car text-blue-600 text-sm"></i>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{dashboard.vehicleCount}</div>
+            <CardContent className="pt-0">
+              <div className="text-2xl font-bold text-foreground mb-1">
+                {dashboard.vehicleCount}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Vehicle assessments
+                Vehicle assessment{dashboard.vehicleCount !== 1 ? "s" : ""}
               </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Properties</CardTitle>
-              <i className="fas fa-home text-muted-foreground"></i>
+          {/* Properties Card */}
+          <Card className="border border-border shadow-sm hover:shadow-md transition-shadow">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Properties
+              </CardTitle>
+              <div className="w-8 h-8 bg-secondary/10 rounded-full flex items-center justify-center">
+                <i className="fas fa-home text-secondary text-sm"></i>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="pt-0">
+              <div className="text-2xl font-bold text-foreground mb-1">
                 {dashboard.propertyCount}
               </div>
               <p className="text-xs text-muted-foreground">
-                Property assessments
+                Property assessment{dashboard.propertyCount !== 1 ? "s" : ""}
               </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Combined Report
-              </CardTitle>
-              <i className="fas fa-file-pdf text-muted-foreground"></i>
-            </CardHeader>
-            <CardContent>
-              <Button
-                className="w-full"
-                size="sm"
-                onClick={() =>
-                  handleDownloadPDF(dashboard.assets, dashboard.totalValue)
-                }
-              >
-                <i className="fas fa-download mr-2"></i>
-                Download PDF
-              </Button>
             </CardContent>
           </Card>
         </div>
