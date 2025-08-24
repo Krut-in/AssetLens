@@ -1,8 +1,20 @@
 # AssetLens
 
+
+<img align="right" src="assets/images/assetlens_logo.png" alt="logo" height="75">
+
 **Real-time Asset Valuation for Smarter Financial Decisions**
 
-_([Demo Video](https://youtu.be/nVz9G9w6lmM?si=b1DoFpRMh63ZaNbr))_
+**Team Members**:
+  - Krutin Rathod
+  - Nihar Patel
+
+<video controls src="demo.mp4" title="Title"></video>
+
+**Event**: Quackathon (Hackathon)
+
+**Video Demo**: [Watch Here](https://youtu.be/nVz9G9w6lmM?si=b1DoFpRMh63ZaNbr)
+
 
 Two computer science graduates walked into a fintech hackathon with zero financial market experience. What they built next might surprise you.
 
@@ -15,6 +27,8 @@ Traditional lending is broken. Manual appraisals are slow, expensive, and exclud
 ## What AssetLens Does
 
 AssetLens transforms how you understand your assets' worth. Whether it's your car, your land, or that vintage collection gathering dust, we provide **instant, accurate valuations** that reflect current market conditions.
+
+![Aim of the project](assets/images/aim_image.png)
 
 ### Core Features
 
