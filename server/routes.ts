@@ -298,21 +298,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
 // Helper function to process property data
 async function processPropertyData(property: any, request: any, storage: any, res: any) {
   try {
-    console.log('Processing property data:', JSON.stringify(property, null, 2));
+    console.log('Processing property data keys:', Object.keys(property));
     
-    // Extract property values from Regrid response - handle both nested and direct property access
-    const propData = property.properties || property;
-    const assessedValue = propData.assessval || propData.totval || 0;
-    const landValue = propData.landval || 0;
-    const improvementValue = propData.improvval || propData.impval || propData.bldgval || 0;
+    // Extract property values from Regrid response - access directly from property object
+    const assessedValue = property.assessval || property.totval || 0;
+    const landValue = property.landval || 0;
+    const improvementValue = property.improvval || property.impval || property.bldgval || 0;
     
-    console.log('Extracted values:', { assessedValue, landValue, improvementValue });
+    console.log('Extracted values:', { 
+      assessedValue, 
+      landValue, 
+      improvementValue,
+      rawAssessval: property.assessval,
+      rawLandval: property.landval,
+      rawImprovval: property.improvval
+    });
     const marketValue = assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue; // Estimate market value as 110% of assessed value
     const propertyType = property.usecd || property.zoning || property.landuse || 'Unknown';
-    const lotSize = property.acres || property.sqft ? (property.sqft / 43560) : null; // Convert sqft to acres if available
+    const lotSize = property.ll_gisacre || (property.sqft ? (property.sqft / 43560) : null); // Convert sqft to acres if available
     const yearBuilt = property.yrbuilt || property.effyr || null;
-    const ownerName = property.owner || property.ownername || null;
-    const apn = property.parcelnumb || property.ll_gisacre || null;
+    
+    // Try multiple owner field variations
+    const ownerName = property.owner || property.ownername || 
+                     (property.enhanced_ownership && property.enhanced_ownership[0] ? property.enhanced_ownership[0].eo_owner : null) || 
+                     null;
+    
+    const apn = property.parcelnumb || property.ll_gisacre || property.id || null;
 
     if (!assessedValue && !landValue && !improvementValue) {
       return res.status(400).json({ 
