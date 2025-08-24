@@ -234,7 +234,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             const simpleParcels = simpleData.parcels?.features || simpleData.features || [];
             
             if (simpleParcels.length > 0) {
-              const property = simpleParcels[0].properties || simpleParcels[0];
+              const property = simpleParcels[0];
+              console.log('Found simple property data:', JSON.stringify(property, null, 2));
               return await processPropertyData(property, request, storage, res);
             }
           }
@@ -244,7 +245,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           });
         }
 
-        const property = parcels[0].properties || parcels[0];
+        const property = parcels[0];
+        console.log('Found property data:', JSON.stringify(property, null, 2));
         return await processPropertyData(property, request, storage, res);
         
         // This is handled by the processPropertyData function now
@@ -298,10 +300,13 @@ async function processPropertyData(property: any, request: any, storage: any, re
   try {
     console.log('Processing property data:', JSON.stringify(property, null, 2));
     
-    // Extract property values from Regrid response
-    const assessedValue = property.assessval || property.totval || 0;
-    const landValue = property.landval || 0;
-    const improvementValue = property.impval || property.bldgval || 0;
+    // Extract property values from Regrid response - handle both nested and direct property access
+    const propData = property.properties || property;
+    const assessedValue = propData.assessval || propData.totval || 0;
+    const landValue = propData.landval || 0;
+    const improvementValue = propData.improvval || propData.impval || propData.bldgval || 0;
+    
+    console.log('Extracted values:', { assessedValue, landValue, improvementValue });
     const marketValue = assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue; // Estimate market value as 110% of assessed value
     const propertyType = property.usecd || property.zoning || property.landuse || 'Unknown';
     const lotSize = property.acres || property.sqft ? (property.sqft / 43560) : null; // Convert sqft to acres if available
