@@ -305,53 +305,6 @@ export default function LandAssessmentForm({
                 )}
               </Button>
 
-              {/* Trial Limitation Notice */}
-              <div className="bg-blue-subtle rounded-xl p-4">
-                <div className="flex items-start space-x-3">
-                  <i className="fas fa-info-circle icon-secondary-blue mt-0.5"></i>
-                  <div className="text-sm">
-                    <p className="font-medium text-foreground mb-2">
-                      Trial Limitation - Use Sample Addresses
-                    </p>
-                    <p className="text-muted-foreground mb-3">
-                      Our trial API token only works for these 7 counties. Try
-                      these real addresses:
-                    </p>
-                    <div className="grid grid-cols-1 gap-2 text-xs">
-                      <div className="bg-card rounded-lg p-3 border border-border">
-                        <p className="font-medium text-accent">
-                          Dallas County, Texas
-                        </p>
-                        <p className="text-muted-foreground">
-                          701 Elm St, Dallas, TX
-                        </p>
-                      </div>
-                      <div className="bg-card rounded-lg p-3 border border-border">
-                        <p className="font-medium text-accent">
-                          Durham County, North Carolina
-                        </p>
-                        <p className="text-muted-foreground">
-                          101 City Hall Plaza, Durham, NC
-                        </p>
-                      </div>
-                      <div className="bg-card rounded-lg p-3 border border-border">
-                        <p className="font-medium text-accent">
-                          Wilson County, Tennessee
-                        </p>
-                        <p className="text-muted-foreground">
-                          1000 N Main St, Lebanon, TN
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-3 p-2 bg-success-subtle rounded-lg">
-                      <p className="text-xs font-medium text-foreground">
-                        <i className="fas fa-star icon-success mr-2"></i>
-                        Recommended: 701 Elm St, Dallas, TX
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </form>
           </Form>
         </CardContent>
