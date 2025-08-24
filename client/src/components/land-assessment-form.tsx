@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   insertLandAssessmentRequestSchema,
   type InsertLandAssessmentRequest,
@@ -26,10 +27,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import GooglePlacesInput from "@/components/google-places-input";
+import MiniMap from "@/components/mini-map";
 
 interface LandAssessmentFormProps {
   onAssessmentComplete: (data: LandAssessmentResponse) => void;
   onLoadingChange: (isLoading: boolean) => void;
+}
+
+interface SelectedLocation {
+  address: string;
+  lat: number;
+  lng: number;
+  city: string;
+  state: string;
+  zipCode: string;
 }
 
 const states = [
@@ -90,6 +102,7 @@ export default function LandAssessmentForm({
   onLoadingChange,
 }: LandAssessmentFormProps) {
   const { toast } = useToast();
+  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
 
   const form = useForm<InsertLandAssessmentRequest>({
     resolver: zodResolver(insertLandAssessmentRequestSchema),
@@ -132,26 +145,45 @@ export default function LandAssessmentForm({
     assessmentMutation.mutate(data);
   };
 
-  return (
-    <Card className="rounded-2xl shadow-lg border border-border bg-card">
-      <CardContent className="p-8">
-        <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-foreground mb-2 flex items-center">
-            <i className="fas fa-map-marked-alt mr-3 icon-primary-green"></i>
-            Property Information
-          </h3>
-          <p className="text-muted-foreground">
-            Enter property address for comprehensive land assessment
-          </p>
-        </div>
+  const handlePlaceSelected = (place: {
+    address: string;
+    lat: number;
+    lng: number;
+    city: string;
+    state: string;
+    zipCode: string;
+  }) => {
+    setSelectedLocation(place);
+    // Auto-fill form fields
+    form.setValue('city', place.city);
+    form.setValue('state', place.state);
+    if (place.zipCode) {
+      form.setValue('zipCode', place.zipCode);
+    }
+  };
 
-        <Form {...form}>
+  return (
+    <div className="grid lg:grid-cols-2 gap-8">
+      {/* Form Section */}
+      <Card className="rounded-2xl shadow-lg border border-border bg-card">
+        <CardContent className="p-8">
+          <div className="mb-6">
+            <h3 className="text-2xl font-semibold text-foreground mb-2 flex items-center">
+              <i className="fas fa-map-marked-alt mr-3 icon-primary-green"></i>
+              Property Information
+            </h3>
+            <p className="text-muted-foreground">
+              Enter property address for comprehensive land assessment
+            </p>
+          </div>
+
+          <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6"
             data-testid="form-land-assessment"
           >
-            {/* Street Address Input */}
+            {/* Street Address Input with Google Places */}
             <FormField
               control={form.control}
               name="streetAddress"
@@ -162,12 +194,12 @@ export default function LandAssessmentForm({
                     Street Address
                   </FormLabel>
                   <FormControl>
-                    <Input
-                      type="text"
+                    <GooglePlacesInput
+                      value={field.value}
+                      onChange={field.onChange}
+                      onPlaceSelected={handlePlaceSelected}
                       placeholder="e.g., 123 Main Street"
-                      {...field}
                       className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground"
-                      data-testid="input-street-address"
                     />
                   </FormControl>
                   <FormMessage />
@@ -297,7 +329,16 @@ export default function LandAssessmentForm({
             </div>
           </form>
         </Form>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Map Section */}
+      <MiniMap 
+        lat={selectedLocation?.lat}
+        lng={selectedLocation?.lng}
+        address={selectedLocation?.address}
+        className="rounded-2xl shadow-lg"
+      />
+    </div>
   );
 }

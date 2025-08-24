@@ -32,7 +32,7 @@ export default function LandAssessment() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">
-                  ValuationHub AI
+                  AssetLens
                 </h1>
                 <p className="text-xs text-muted-foreground">
                   Comprehensive Asset Valuation Platform
@@ -124,7 +124,7 @@ export default function LandAssessment() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 items-start">
+        <div className="space-y-8">
           <LandAssessmentForm
             onAssessmentComplete={handleAssessmentComplete}
             onLoadingChange={handleLoadingChange}
@@ -142,7 +142,7 @@ export default function LandAssessment() {
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <i className="fas fa-chart-bar text-primary-foreground"></i>
                 </div>
-                <h3 className="text-lg font-bold">ValuationHub AI</h3>
+                <h3 className="text-lg font-bold">AssetLens</h3>
               </div>
               <p className="text-secondary-foreground/80 mb-4">
                 Comprehensive AI-powered valuation platform providing accurate,
@@ -180,7 +180,7 @@ export default function LandAssessment() {
           </div>
           <div className="border-t border-secondary-foreground/20 mt-8 pt-8 text-center text-secondary-foreground/60 text-sm">
             <p>
-              &copy; 2024 ValuationHub AI. All rights reserved. Powered by
+              &copy; 2024 AssetLens. All rights reserved. Powered by
               MarketCheck & Regrid APIs.
             </p>
           </div>
