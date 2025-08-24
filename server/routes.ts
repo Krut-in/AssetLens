@@ -208,53 +208,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
         
         // Process Regrid response to extract property data
-        const parcels = regridData.parcels || regridData.features || [];
+        const parcels = regridData.parcels?.features || regridData.features || [];
         
         console.log('Regrid parcels found:', parcels.length);
+        console.log('Full parcels data:', JSON.stringify(parcels, null, 2));
         
         if (parcels.length === 0) {
+          // Try a simpler address format for Regrid
+          const simpleAddress = validatedData.streetAddress.split(',')[0];
+          const simpleQuery = `${simpleAddress}, ${validatedData.city}, ${validatedData.state}`;
+          
+          console.log('Trying simple address format:', simpleQuery);
+          
+          const simpleApiUrl = `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(simpleQuery)}&limit=1`;
+          
+          const simpleResponse = await fetch(simpleApiUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
+          });
+          
+          if (simpleResponse.ok) {
+            const simpleData = await simpleResponse.json();
+            const simpleParcels = simpleData.parcels?.features || simpleData.features || [];
+            
+            if (simpleParcels.length > 0) {
+              const property = simpleParcels[0].properties || simpleParcels[0];
+              return await processPropertyData(property, request, storage, res);
+            }
+          }
+          
           return res.status(400).json({ 
-            message: "Unable to find property for the provided address. Please verify your address details are correct." 
+            message: "Unable to find property for the provided address. This may be because the address is not available in our supported counties (Marion County IN, Dallas County TX, Wilson County TN, Durham County NC, Fillmore County NE, Clark County WI, or Gurabo Municipio PR). Please try a different address within these counties." 
           });
         }
 
         const property = parcels[0].properties || parcels[0];
+        return await processPropertyData(property, request, storage, res);
         
-        // Extract property values from Regrid response
-        const assessedValue = property.assessval || property.totval || 0;
-        const landValue = property.landval || 0;
-        const improvementValue = property.impval || property.bldgval || 0;
-        const marketValue = assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue; // Estimate market value as 110% of assessed value
-        const propertyType = property.usecd || property.zoning || property.landuse || 'Unknown';
-        const lotSize = property.acres || property.sqft ? (property.sqft / 43560) : null; // Convert sqft to acres if available
-        const yearBuilt = property.yrbuilt || property.effyr || null;
-        const ownerName = property.owner || property.ownername || null;
-        const apn = property.parcelnumb || property.ll_gisacre || null;
-
-        if (!assessedValue && !landValue && !improvementValue) {
-          return res.status(400).json({ 
-            message: "Unable to determine property value. Please verify your property details are correct." 
-          });
-        }
-
-        // Create land assessment result
-        const result = await storage.createLandAssessmentResult({
-          requestId: request.id,
-          assessedValue: assessedValue.toString(),
-          marketValue: marketValue.toString(),
-          landValue: landValue.toString(),
-          improvementValue: improvementValue.toString(),
-          propertyType: propertyType,
-          lotSize: lotSize ? lotSize.toString() : null,
-          yearBuilt: yearBuilt,
-          ownerName: ownerName,
-          apn: apn,
-        });
-
-        // Get full land assessment response
-        const assessmentResponse = await storage.getLandAssessmentWithResult(request.id);
-        
-        res.json(assessmentResponse);
+        // This is handled by the processPropertyData function now
       } catch (apiError) {
         console.error('Regrid API Error:', apiError);
         return res.status(500).json({ 
@@ -298,4 +291,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
   return httpServer;
+}
+
+// Helper function to process property data
+async function processPropertyData(property: any, request: any, storage: any, res: any) {
+  try {
+    console.log('Processing property data:', JSON.stringify(property, null, 2));
+    
+    // Extract property values from Regrid response
+    const assessedValue = property.assessval || property.totval || 0;
+    const landValue = property.landval || 0;
+    const improvementValue = property.impval || property.bldgval || 0;
+    const marketValue = assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue; // Estimate market value as 110% of assessed value
+    const propertyType = property.usecd || property.zoning || property.landuse || 'Unknown';
+    const lotSize = property.acres || property.sqft ? (property.sqft / 43560) : null; // Convert sqft to acres if available
+    const yearBuilt = property.yrbuilt || property.effyr || null;
+    const ownerName = property.owner || property.ownername || null;
+    const apn = property.parcelnumb || property.ll_gisacre || null;
+
+    if (!assessedValue && !landValue && !improvementValue) {
+      return res.status(400).json({ 
+        message: "Unable to determine property value. Please verify your property details are correct." 
+      });
+    }
+
+    // Create land assessment result
+    const result = await storage.createLandAssessmentResult({
+      requestId: request.id,
+      assessedValue: assessedValue.toString(),
+      marketValue: marketValue.toString(),
+      landValue: landValue.toString(),
+      improvementValue: improvementValue.toString(),
+      propertyType: propertyType,
+      lotSize: lotSize ? lotSize.toString() : null,
+      yearBuilt: yearBuilt,
+      ownerName: ownerName,
+      apn: apn,
+    });
+
+    // Get full land assessment response
+    const assessmentResponse = await storage.getLandAssessmentWithResult(request.id);
+    
+    res.json(assessmentResponse);
+  } catch (error) {
+    console.error('Property processing error:', error);
+    return res.status(500).json({ 
+      message: "Unable to process property data. Please try again later." 
+    });
+  }
 }
