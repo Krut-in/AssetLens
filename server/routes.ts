@@ -156,6 +156,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Call Regrid API for land assessment
       try {
         // Format address for Regrid API - handle Google Places formatted addresses
+        console.log('Raw streetAddress from frontend:', validatedData.streetAddress);
+        
         let addressQuery;
         if (validatedData.streetAddress.includes(',')) {
           // Google Places formatted address - clean it up for Regrid API
@@ -163,9 +165,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .replace(', USA', '') // Remove USA suffix
             .replace(', United States', '') // Remove United States suffix
             .trim();
+          console.log('Cleaned address for Regrid:', addressQuery);
         } else {
           // Manual entry - combine fields
           addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
+          console.log('Combined address for Regrid:', addressQuery);
         }
 
         const apiUrl = `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(addressQuery)}&limit=1`;
