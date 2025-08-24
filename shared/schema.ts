@@ -32,6 +32,30 @@ export const valuationResults = pgTable("valuation_results", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+export const landAssessmentRequests = pgTable("land_assessment_requests", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  streetAddress: text("street_address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  zipCode: text("zip_code"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const landAssessmentResults = pgTable("land_assessment_results", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  requestId: varchar("request_id").references(() => landAssessmentRequests.id),
+  assessedValue: decimal("assessed_value", { precision: 12, scale: 2 }),
+  marketValue: decimal("market_value", { precision: 12, scale: 2 }),
+  landValue: decimal("land_value", { precision: 12, scale: 2 }),
+  improvementValue: decimal("improvement_value", { precision: 12, scale: 2 }),
+  propertyType: text("property_type"),
+  lotSize: decimal("lot_size", { precision: 10, scale: 2 }),
+  yearBuilt: integer("year_built"),
+  ownerName: text("owner_name"),
+  apn: text("apn"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
   password: true,
@@ -47,12 +71,26 @@ export const insertValuationResultSchema = createInsertSchema(valuationResults).
   createdAt: true,
 });
 
+export const insertLandAssessmentRequestSchema = createInsertSchema(landAssessmentRequests).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertLandAssessmentResultSchema = createInsertSchema(landAssessmentResults).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type ValuationRequest = typeof valuationRequests.$inferSelect;
 export type InsertValuationRequest = z.infer<typeof insertValuationRequestSchema>;
 export type ValuationResult = typeof valuationResults.$inferSelect;
 export type InsertValuationResult = z.infer<typeof insertValuationResultSchema>;
+export type LandAssessmentRequest = typeof landAssessmentRequests.$inferSelect;
+export type InsertLandAssessmentRequest = z.infer<typeof insertLandAssessmentRequestSchema>;
+export type LandAssessmentResult = typeof landAssessmentResults.$inferSelect;
+export type InsertLandAssessmentResult = z.infer<typeof insertLandAssessmentResultSchema>;
 
 // Extended types for the API
 export type ValuationResponse = {
@@ -61,6 +99,19 @@ export type ValuationResponse = {
   vehicleInfo: {
     summary: string;
     mileage: string;
+    location: string;
+  };
+  reportInfo: {
+    date: string;
+  };
+};
+
+export type LandAssessmentResponse = {
+  request: LandAssessmentRequest;
+  result: LandAssessmentResult;
+  propertyInfo: {
+    summary: string;
+    address: string;
     location: string;
   };
   reportInfo: {

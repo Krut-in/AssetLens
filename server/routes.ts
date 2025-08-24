@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertValuationRequestSchema } from "@shared/schema";
+import { insertValuationRequestSchema, insertLandAssessmentRequestSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -129,6 +129,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       console.error('Valuation Error:', error);
+      res.status(500).json({ 
+        message: "An unexpected error occurred. Please try again later." 
+      });
+    }
+  });
+
+  // Land assessment endpoint
+  app.post("/api/land-assessment", async (req, res) => {
+    try {
+      // Validate request body
+      const validatedData = insertLandAssessmentRequestSchema.parse(req.body);
+      
+      // Create land assessment request
+      const request = await storage.createLandAssessmentRequest(validatedData);
+      
+      // Get Regrid API token from environment
+      const apiToken = process.env.REGRID_API_TOKEN;
+      
+      if (!apiToken) {
+        return res.status(500).json({ 
+          message: "Regrid API token is not configured. Please contact support." 
+        });
+      }
+
+      // Call Regrid API for land assessment
+      try {
+        // Format address for Regrid API
+        const addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
+        
+        const regridResponse = await fetch(
+          `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(addressQuery)}&limit=1`,
+          {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
+          }
+        );
+
+        if (!regridResponse.ok) {
+          if (regridResponse.status === 401) {
+            return res.status(500).json({ 
+              message: "Invalid Regrid API credentials. Please contact support." 
+            });
+          } else if (regridResponse.status === 404) {
+            return res.status(400).json({ 
+              message: "Property not found in our database. Please check your address and try again." 
+            });
+          } else {
+            return res.status(500).json({ 
+              message: "Unable to retrieve property data at this time. Please try again later." 
+            });
+          }
+        }
+
+        const regridData = await regridResponse.json();
+        
+        // Process Regrid response to extract property data
+        const features = regridData.features || [];
+        
+        if (features.length === 0) {
+          return res.status(400).json({ 
+            message: "Unable to find property for the provided address. Please verify your address details are correct." 
+          });
+        }
+
+        const property = features[0].properties;
+        
+        // Extract property values from Regrid response
+        const assessedValue = property.assessval || property.totval || 0;
+        const landValue = property.landval || 0;
+        const improvementValue = property.impval || property.bldgval || 0;
+        const marketValue = assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue; // Estimate market value as 110% of assessed value
+        const propertyType = property.usecd || property.zoning || property.landuse || 'Unknown';
+        const lotSize = property.acres || property.sqft ? (property.sqft / 43560) : null; // Convert sqft to acres if available
+        const yearBuilt = property.yrbuilt || property.effyr || null;
+        const ownerName = property.owner || property.ownername || null;
+        const apn = property.parcelnumb || property.ll_gisacre || null;
+
+        if (!assessedValue && !landValue && !improvementValue) {
+          return res.status(400).json({ 
+            message: "Unable to determine property value. Please verify your property details are correct." 
+          });
+        }
+
+        // Create land assessment result
+        const result = await storage.createLandAssessmentResult({
+          requestId: request.id,
+          assessedValue: assessedValue.toString(),
+          marketValue: marketValue.toString(),
+          landValue: landValue.toString(),
+          improvementValue: improvementValue.toString(),
+          propertyType: propertyType,
+          lotSize: lotSize ? lotSize.toString() : null,
+          yearBuilt: yearBuilt,
+          ownerName: ownerName,
+          apn: apn,
+        });
+
+        // Get full land assessment response
+        const assessmentResponse = await storage.getLandAssessmentWithResult(request.id);
+        
+        res.json(assessmentResponse);
+      } catch (apiError) {
+        console.error('Regrid API Error:', apiError);
+        return res.status(500).json({ 
+          message: "Unable to connect to property data service. Please try again later." 
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Invalid property information provided. Please check all fields and try again.",
+          errors: error.errors
+        });
+      }
+      
+      console.error('Land Assessment Error:', error);
       res.status(500).json({ 
         message: "An unexpected error occurred. Please try again later." 
       });

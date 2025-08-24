@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import CarValuationForm from "../components/car-valuation-form";
-import ValuationResults from "../components/valuation-results";
-import type { ValuationResponse } from "@shared/schema";
+import LandAssessmentForm from "../components/land-assessment-form";
+import LandAssessmentResults from "../components/land-assessment-results";
+import type { LandAssessmentResponse } from "@shared/schema";
 
-export default function Home() {
-  const [valuationData, setValuationData] = useState<ValuationResponse | null>(null);
+export default function LandAssessment() {
+  const [assessmentData, setAssessmentData] = useState<LandAssessmentResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleValuationComplete = (data: ValuationResponse) => {
-    setValuationData(data);
+  const handleAssessmentComplete = (data: LandAssessmentResponse) => {
+    setAssessmentData(data);
     setIsLoading(false);
   };
 
@@ -27,7 +27,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <i className="fas fa-car text-primary-foreground text-lg"></i>
+                <i className="fas fa-map-marked-alt text-primary-foreground text-lg"></i>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">ValuationHub AI</h1>
@@ -54,8 +54,8 @@ export default function Home() {
                   <span>Secure & Trusted</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <i className="fas fa-clock text-primary"></i>
-                  <span>Real-time Data</span>
+                  <i className="fas fa-database text-primary"></i>
+                  <span>156M+ Properties</span>
                 </div>
               </div>
             </div>
@@ -69,12 +69,12 @@ export default function Home() {
         <div className="flex justify-center mb-8">
           <div className="inline-flex bg-card rounded-xl p-2 border border-border">
             <Link href="/">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/80">
+              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
                 <i className="fas fa-car mr-2"></i>Vehicle Valuation
               </Button>
             </Link>
             <Link href="/land-assessment">
-              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/80">
                 <i className="fas fa-map-marked-alt mr-2"></i>Land Assessment
               </Button>
             </Link>
@@ -83,33 +83,33 @@ export default function Home() {
 
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-foreground mb-4">Get Your Vehicle's Value in Seconds</h2>
+          <h2 className="text-4xl font-bold text-foreground mb-4">Get Your Property's Value in Seconds</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Enter your car details below to receive an instant AI-powered valuation report with loan-to-value calculations for smart financing decisions.
+            Enter your property address below to receive a comprehensive land assessment report with market valuations and detailed property information.
           </p>
           <div className="mt-6 flex items-center justify-center space-x-8 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">
               <i className="fas fa-database text-primary"></i>
-              <span>MarketCheck API Integration</span>
+              <span>Regrid API Integration</span>
             </div>
             <div className="flex items-center space-x-2">
               <i className="fas fa-chart-line text-accent"></i>
-              <span>True Market Value™</span>
+              <span>Public Tax Records</span>
             </div>
             <div className="flex items-center space-x-2">
-              <i className="fas fa-calculator text-warning"></i>
-              <span>LTV Analysis</span>
+              <i className="fas fa-map-marked-alt text-warning"></i>
+              <span>Parcel Analysis</span>
             </div>
           </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 items-start">
-          <CarValuationForm 
-            onValuationComplete={handleValuationComplete}
+          <LandAssessmentForm 
+            onAssessmentComplete={handleAssessmentComplete}
             onLoadingChange={handleLoadingChange}
           />
-          <ValuationResults 
-            data={valuationData} 
+          <LandAssessmentResults 
+            data={assessmentData} 
             isLoading={isLoading}
           />
         </div>
@@ -135,7 +135,7 @@ export default function Home() {
                   <span>Bank-Grade Security</span>
                 </div>
                 <div className="flex items-center space-x-2 text-sm text-secondary-foreground/80">
-                  <i className="fas fa-clock text-primary"></i>
+                  <i className="fas fa-database text-primary"></i>
                   <span>Real-time Data</span>
                 </div>
               </div>

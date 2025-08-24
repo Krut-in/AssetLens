@@ -1,4 +1,4 @@
-import { type User, type InsertUser, type ValuationRequest, type InsertValuationRequest, type ValuationResult, type InsertValuationResult, type ValuationResponse } from "@shared/schema";
+import { type User, type InsertUser, type ValuationRequest, type InsertValuationRequest, type ValuationResult, type InsertValuationResult, type ValuationResponse, type LandAssessmentRequest, type InsertLandAssessmentRequest, type LandAssessmentResult, type InsertLandAssessmentResult, type LandAssessmentResponse } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -8,17 +8,24 @@ export interface IStorage {
   createValuationRequest(request: InsertValuationRequest): Promise<ValuationRequest>;
   createValuationResult(result: InsertValuationResult): Promise<ValuationResult>;
   getValuationWithResult(requestId: string): Promise<ValuationResponse | undefined>;
+  createLandAssessmentRequest(request: InsertLandAssessmentRequest): Promise<LandAssessmentRequest>;
+  createLandAssessmentResult(result: InsertLandAssessmentResult): Promise<LandAssessmentResult>;
+  getLandAssessmentWithResult(requestId: string): Promise<LandAssessmentResponse | undefined>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   private valuationRequests: Map<string, ValuationRequest>;
   private valuationResults: Map<string, ValuationResult>;
+  private landAssessmentRequests: Map<string, LandAssessmentRequest>;
+  private landAssessmentResults: Map<string, LandAssessmentResult>;
 
   constructor() {
     this.users = new Map();
     this.valuationRequests = new Map();
     this.valuationResults = new Map();
+    this.landAssessmentRequests = new Map();
+    this.landAssessmentResults = new Map();
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -94,6 +101,71 @@ export class MemStorage implements IStorage {
       request,
       result,
       vehicleInfo,
+      reportInfo,
+    };
+  }
+
+  async createLandAssessmentRequest(insertRequest: InsertLandAssessmentRequest): Promise<LandAssessmentRequest> {
+    const id = randomUUID();
+    const request: LandAssessmentRequest = {
+      id,
+      streetAddress: insertRequest.streetAddress,
+      city: insertRequest.city,
+      state: insertRequest.state,
+      zipCode: insertRequest.zipCode || null,
+      createdAt: new Date(),
+    };
+    this.landAssessmentRequests.set(id, request);
+    return request;
+  }
+
+  async createLandAssessmentResult(insertResult: InsertLandAssessmentResult): Promise<LandAssessmentResult> {
+    const id = randomUUID();
+    const result: LandAssessmentResult = {
+      id,
+      requestId: insertResult.requestId || null,
+      assessedValue: insertResult.assessedValue || null,
+      marketValue: insertResult.marketValue || null,
+      landValue: insertResult.landValue || null,
+      improvementValue: insertResult.improvementValue || null,
+      propertyType: insertResult.propertyType || null,
+      lotSize: insertResult.lotSize || null,
+      yearBuilt: insertResult.yearBuilt || null,
+      ownerName: insertResult.ownerName || null,
+      apn: insertResult.apn || null,
+      createdAt: new Date(),
+    };
+    this.landAssessmentResults.set(id, result);
+    return result;
+  }
+
+  async getLandAssessmentWithResult(requestId: string): Promise<LandAssessmentResponse | undefined> {
+    const request = this.landAssessmentRequests.get(requestId);
+    if (!request) return undefined;
+
+    const result = Array.from(this.landAssessmentResults.values()).find(
+      (r) => r.requestId === requestId
+    );
+    if (!result) return undefined;
+
+    const propertyInfo = {
+      summary: `${request.streetAddress}`,
+      address: `${request.streetAddress}, ${request.city}, ${request.state}${request.zipCode ? ' ' + request.zipCode : ''}`,
+      location: `${request.city}, ${request.state}`,
+    };
+
+    const reportInfo = {
+      date: new Date().toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      }),
+    };
+
+    return {
+      request,
+      result,
+      propertyInfo,
       reportInfo,
     };
   }
