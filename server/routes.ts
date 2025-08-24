@@ -158,8 +158,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Format address for Regrid API - handle Google Places formatted addresses
         let addressQuery;
         if (validatedData.streetAddress.includes(',')) {
-          // Google Places formatted address - use as is
-          addressQuery = validatedData.streetAddress;
+          // Google Places formatted address - clean it up for Regrid API
+          addressQuery = validatedData.streetAddress
+            .replace(', USA', '') // Remove USA suffix
+            .replace(', United States', '') // Remove United States suffix
+            .trim();
         } else {
           // Manual entry - combine fields
           addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
