@@ -9,7 +9,10 @@
   - Krutin Rathod
   - Nihar Patel
 
-<video controls src="demo.mp4" title="Title"></video>
+
+https://github.com/user-attachments/assets/b7137e19-9891-4f13-b2eb-d1ee081d2838
+
+
 
 **Event**: Quackathon (Hackathon)
 
