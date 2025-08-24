@@ -7,7 +7,9 @@ import ValuationResults from "../components/valuation-results";
 import type { ValuationResponse } from "@shared/schema";
 
 export default function Home() {
-  const [valuationData, setValuationData] = useState<ValuationResponse | null>(null);
+  const [valuationData, setValuationData] = useState<ValuationResponse | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
 
   const handleValuationComplete = (data: ValuationResponse) => {
@@ -30,21 +32,32 @@ export default function Home() {
                 <i className="fas fa-car text-primary-foreground text-lg"></i>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">ValuationHub AI</h1>
-                <p className="text-xs text-muted-foreground">Comprehensive Asset Valuation Platform</p>
+                <h1 className="text-xl font-bold text-foreground">
+                  ValuationHub AI
+                </h1>
+                <p className="text-xs text-muted-foreground">
+                  Comprehensive Asset Valuation Platform
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               {/* Navigation */}
               <nav className="hidden md:flex items-center space-x-4">
                 <Link href="/">
-                  <Button variant="ghost" className="text-foreground hover:text-primary">
+                  <Button
+                    variant="ghost"
+                    className="text-foreground hover:text-primary"
+                  >
                     <i className="fas fa-car mr-2"></i>Vehicle Valuation
                   </Button>
                 </Link>
                 <Link href="/land-assessment">
-                  <Button variant="ghost" className="text-foreground hover:text-primary">
-                    <i className="fas fa-map-marked-alt mr-2"></i>Land Assessment
+                  <Button
+                    variant="ghost"
+                    className="text-foreground hover:text-primary"
+                  >
+                    <i className="fas fa-map-marked-alt mr-2"></i>Land
+                    Assessment
                   </Button>
                 </Link>
               </nav>
@@ -69,13 +82,17 @@ export default function Home() {
         <div className="flex justify-center mb-8">
           <div className="inline-flex bg-card rounded-xl p-2 border border-border">
             <Link href="/">
-              <Button className="bg-primary text-primary-foreground hover:bg-primary/80">
-                <i className="fas fa-car mr-2"></i>Vehicle Valuation
+              <Button className="btn-nav-active">
+                <i className="fas fa-car mr-2 icon-trust"></i>Vehicle Valuation
               </Button>
             </Link>
             <Link href="/land-assessment">
-              <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-                <i className="fas fa-map-marked-alt mr-2"></i>Land Assessment
+              <Button
+                variant="ghost"
+                className="btn-nav-inactive hover:!bg-transparent hover:!text-white"
+              >
+                <i className="fas fa-map-marked-alt mr-2 icon-secondary-blue"></i>
+                Land Assessment
               </Button>
             </Link>
           </div>
@@ -83,9 +100,13 @@ export default function Home() {
 
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-foreground mb-4">Get Your Vehicle's Value in Seconds</h2>
+          <h2 className="text-4xl font-bold text-foreground mb-4">
+            Get Your Vehicle's Value in Seconds
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Enter your car details below to receive an instant AI-powered valuation report with loan-to-value calculations for smart financing decisions.
+            Enter your car details below to receive an instant AI-powered
+            valuation report with loan-to-value calculations for smart financing
+            decisions.
           </p>
           <div className="mt-6 flex items-center justify-center space-x-8 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">
@@ -104,14 +125,11 @@ export default function Home() {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 items-start">
-          <CarValuationForm 
+          <CarValuationForm
             onValuationComplete={handleValuationComplete}
             onLoadingChange={handleLoadingChange}
           />
-          <ValuationResults 
-            data={valuationData} 
-            isLoading={isLoading}
-          />
+          <ValuationResults data={valuationData} isLoading={isLoading} />
         </div>
       </main>
 
@@ -127,7 +145,8 @@ export default function Home() {
                 <h3 className="text-lg font-bold">ValuationHub AI</h3>
               </div>
               <p className="text-secondary-foreground/80 mb-4">
-                Comprehensive AI-powered valuation platform providing accurate, real-time market data for vehicles and properties.
+                Comprehensive AI-powered valuation platform providing accurate,
+                real-time market data for vehicles and properties.
               </p>
               <div className="flex space-x-4">
                 <div className="flex items-center space-x-2 text-sm text-secondary-foreground/80">
@@ -160,7 +179,10 @@ export default function Home() {
             </div>
           </div>
           <div className="border-t border-secondary-foreground/20 mt-8 pt-8 text-center text-secondary-foreground/60 text-sm">
-            <p>&copy; 2024 ValuationHub AI. All rights reserved. Powered by MarketCheck & Regrid APIs.</p>
+            <p>
+              &copy; 2024 ValuationHub AI. All rights reserved. Powered by
+              MarketCheck & Regrid APIs.
+            </p>
           </div>
         </div>
       </footer>

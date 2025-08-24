@@ -1,14 +1,31 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { insertLandAssessmentRequestSchema, type InsertLandAssessmentRequest, type LandAssessmentResponse } from "@shared/schema";
+import {
+  insertLandAssessmentRequestSchema,
+  type InsertLandAssessmentRequest,
+  type LandAssessmentResponse,
+} from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface LandAssessmentFormProps {
   onAssessmentComplete: (data: LandAssessmentResponse) => void;
@@ -68,9 +85,12 @@ const states = [
   { value: "WY", label: "Wyoming" },
 ];
 
-export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChange }: LandAssessmentFormProps) {
+export default function LandAssessmentForm({
+  onAssessmentComplete,
+  onLoadingChange,
+}: LandAssessmentFormProps) {
   const { toast } = useToast();
-  
+
   const form = useForm<InsertLandAssessmentRequest>({
     resolver: zodResolver(insertLandAssessmentRequestSchema),
     defaultValues: {
@@ -89,7 +109,7 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
     onMutate: () => {
       onLoadingChange(true);
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       onAssessmentComplete(data);
       toast({
         title: "Assessment Complete",
@@ -100,7 +120,9 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
       onLoadingChange(false);
       toast({
         title: "Assessment Failed",
-        description: error.message || "Unable to complete land assessment. Please try again.",
+        description:
+          error.message ||
+          "Unable to complete land assessment. Please try again.",
         variant: "destructive",
       });
     },
@@ -115,15 +137,20 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
       <CardContent className="p-8">
         <div className="mb-6">
           <h3 className="text-2xl font-semibold text-foreground mb-2 flex items-center">
-            <i className="fas fa-map-marked-alt mr-3 text-primary"></i>
+            <i className="fas fa-map-marked-alt mr-3 icon-primary-green"></i>
             Property Information
           </h3>
-          <p className="text-muted-foreground">Enter property address for comprehensive land assessment</p>
+          <p className="text-muted-foreground">
+            Enter property address for comprehensive land assessment
+          </p>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="form-land-assessment">
-            
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
+            data-testid="form-land-assessment"
+          >
             {/* Street Address Input */}
             <FormField
               control={form.control}
@@ -131,7 +158,8 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-home mr-2 text-primary"></i>Street Address
+                    <i className="fas fa-home mr-2 icon-primary-green"></i>
+                    Street Address
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -154,7 +182,7 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-city mr-2 text-primary"></i>City
+                    <i className="fas fa-city mr-2 icon-primary-green"></i>City
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -177,11 +205,11 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-flag mr-2 text-primary"></i>State
+                    <i className="fas fa-flag mr-2 icon-primary-green"></i>State
                   </FormLabel>
                   <FormControl>
-                    <Select 
-                      onValueChange={field.onChange} 
+                    <Select
+                      onValueChange={field.onChange}
                       value={field.value}
                       data-testid="select-state"
                     >
@@ -189,7 +217,7 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
                         <SelectValue placeholder="Select State" />
                       </SelectTrigger>
                       <SelectContent>
-                        {states.map((state) => (
+                        {states.map(state => (
                           <SelectItem key={state.value} value={state.value}>
                             {state.label}
                           </SelectItem>
@@ -202,71 +230,67 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
               )}
             />
 
-            {/* ZIP Code Input */}
-            <FormField
-              control={form.control}
-              name="zipCode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-map-pin mr-2 text-primary"></i>ZIP Code
-                    <span className="text-muted-foreground text-xs ml-2">(Optional)</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="e.g., 90210"
-                      {...field}
-                      value={field.value || ""}
-                      maxLength={5}
-                      className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground"
-                      data-testid="input-zipcode"
-                    />
-                  </FormControl>
-                  <p className="mt-1 text-xs text-muted-foreground">Used for more precise property location</p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
             {/* Submit Button */}
             <Button
               type="submit"
               disabled={assessmentMutation.isPending}
-              className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:from-accent hover:to-primary transition-all duration-200 transform hover:scale-[1.02] focus:ring-4 focus:ring-primary/20"
+              className="btn-success-green w-full disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-submit-assessment"
             >
-              <i className="fas fa-search mr-2"></i>
-              {assessmentMutation.isPending ? "Analyzing Property..." : "Get Land Assessment"}
+              <i className="fas fa-map-marked-alt mr-3 icon-success"></i>
+              {assessmentMutation.isPending ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  Analyzing Property...
+                </>
+              ) : (
+                "Get Land Assessment"
+              )}
             </Button>
 
             {/* Trial Limitation Notice */}
-            <div className="bg-warning/20 rounded-xl p-4 border border-warning/40">
+            <div className="bg-blue-subtle rounded-xl p-4">
               <div className="flex items-start space-x-3">
-                <i className="fas fa-exclamation-triangle text-warning mt-0.5"></i>
+                <i className="fas fa-info-circle icon-secondary-blue mt-0.5"></i>
                 <div className="text-sm">
-                  <p className="font-medium text-foreground mb-2">Trial Limitation - Use Sample Addresses</p>
-                  <p className="text-muted-foreground mb-3">Our trial API token only works for these 7 counties. Try these real addresses:</p>
+                  <p className="font-medium text-foreground mb-2">
+                    Trial Limitation - Use Sample Addresses
+                  </p>
+                  <p className="text-muted-foreground mb-3">
+                    Our trial API token only works for these 7 counties. Try
+                    these real addresses:
+                  </p>
                   <div className="grid grid-cols-1 gap-2 text-xs">
-                    <div className="bg-background rounded-lg p-2">
-                      <p className="font-medium text-foreground">Dallas County, Texas</p>
-                      <p className="text-muted-foreground">1500 Marilla Street, Dallas, TX 75201</p>
+                    <div className="bg-card rounded-lg p-3 border border-border">
+                      <p className="font-medium text-accent">
+                        Dallas County, Texas
+                      </p>
+                      <p className="text-muted-foreground">
+                        701 Elm St, Dallas, TX
+                      </p>
                     </div>
-                    <div className="bg-background rounded-lg p-2">
-                      <p className="font-medium text-foreground">Marion County, Indiana</p>
-                      <p className="text-muted-foreground">200 E Washington Street, Indianapolis, IN 46204</p>
+                    <div className="bg-card rounded-lg p-3 border border-border">
+                      <p className="font-medium text-accent">
+                        Durham County, North Carolina
+                      </p>
+                      <p className="text-muted-foreground">
+                        101 City Hall Plaza, Durham, NC
+                      </p>
                     </div>
-                    <div className="bg-background rounded-lg p-2">
-                      <p className="font-medium text-foreground">Durham County, North Carolina</p>
-                      <p className="text-muted-foreground">101 City Hall Plaza, Durham, NC 27701</p>
-                    </div>
-                    <div className="bg-background rounded-lg p-2">
-                      <p className="font-medium text-foreground">Wilson County, Tennessee</p>
-                      <p className="text-muted-foreground">228 E Main Street, Lebanon, TN 37087</p>
+                    <div className="bg-card rounded-lg p-3 border border-border">
+                      <p className="font-medium text-accent">
+                        Wilson County, Tennessee
+                      </p>
+                      <p className="text-muted-foreground">
+                        1000 N Main St, Lebanon, TN
+                      </p>
                     </div>
                   </div>
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    <strong>Try This:</strong> 1500 Marilla Street, Dallas, TX 75201
+                  <div className="mt-3 p-2 bg-success-subtle rounded-lg">
+                    <p className="text-xs font-medium text-foreground">
+                      <i className="fas fa-star icon-success mr-2"></i>
+                      Recommended: 701 Elm St, Dallas, TX
+                    </p>
                   </div>
                 </div>
               </div>

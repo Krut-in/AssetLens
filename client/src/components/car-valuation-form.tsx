@@ -1,14 +1,31 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
-import { insertValuationRequestSchema, type InsertValuationRequest, type ValuationResponse } from "@shared/schema";
+import {
+  insertValuationRequestSchema,
+  type InsertValuationRequest,
+  type ValuationResponse,
+} from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CarValuationFormProps {
   onValuationComplete: (data: ValuationResponse) => void;
@@ -62,9 +79,12 @@ const carModels: Record<string, { value: string; label: string }[]> = {
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 15 }, (_, i) => currentYear - i);
 
-export default function CarValuationForm({ onValuationComplete, onLoadingChange }: CarValuationFormProps) {
+export default function CarValuationForm({
+  onValuationComplete,
+  onLoadingChange,
+}: CarValuationFormProps) {
   const { toast } = useToast();
-  
+
   const form = useForm<InsertValuationRequest>({
     resolver: zodResolver(insertValuationRequestSchema),
     defaultValues: {
@@ -87,7 +107,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
     onMutate: () => {
       onLoadingChange(true);
     },
-    onSuccess: (data) => {
+    onSuccess: data => {
       onValuationComplete(data);
       toast({
         title: "Valuation Complete",
@@ -98,7 +118,9 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
       onLoadingChange(false);
       toast({
         title: "Valuation Failed",
-        description: error.message || "Unable to complete vehicle valuation. Please try again.",
+        description:
+          error.message ||
+          "Unable to complete vehicle valuation. Please try again.",
         variant: "destructive",
       });
     },
@@ -113,15 +135,20 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
       <CardContent className="p-8">
         <div className="mb-6">
           <h3 className="text-2xl font-semibold text-foreground mb-2 flex items-center">
-            <i className="fas fa-car mr-3 text-primary"></i>
+            <i className="fas fa-car mr-3 icon-secondary-blue"></i>
             Vehicle Information
           </h3>
-          <p className="text-muted-foreground">Enter your car details for instant AI-powered valuation</p>
+          <p className="text-muted-foreground">
+            Enter your car details for instant AI-powered valuation
+          </p>
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" data-testid="form-valuation">
-            
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
+            data-testid="form-valuation"
+          >
             {/* Make Input */}
             <FormField
               control={form.control}
@@ -129,11 +156,12 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-industry mr-2 text-primary"></i>Make
+                    <i className="fas fa-industry mr-2 icon-secondary-blue"></i>
+                    Make
                   </FormLabel>
                   <FormControl>
-                    <Select 
-                      onValueChange={field.onChange} 
+                    <Select
+                      onValueChange={field.onChange}
                       value={field.value}
                       data-testid="select-make"
                     >
@@ -141,7 +169,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                         <SelectValue placeholder="Select Make" />
                       </SelectTrigger>
                       <SelectContent>
-                        {carMakes.map((make) => (
+                        {carMakes.map(make => (
                           <SelectItem key={make.value} value={make.value}>
                             {make.label}
                           </SelectItem>
@@ -161,11 +189,11 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-car mr-2 text-primary"></i>Model
+                    <i className="fas fa-car mr-2 icon-secondary-blue"></i>Model
                   </FormLabel>
                   <FormControl>
-                    <Select 
-                      onValueChange={field.onChange} 
+                    <Select
+                      onValueChange={field.onChange}
                       value={field.value}
                       disabled={!selectedMake}
                       data-testid="select-model"
@@ -174,7 +202,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                         <SelectValue placeholder="Select Model" />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableModels.map((model) => (
+                        {availableModels.map(model => (
                           <SelectItem key={model.value} value={model.value}>
                             {model.label}
                           </SelectItem>
@@ -194,11 +222,12 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-calendar-alt mr-2 text-primary"></i>Year
+                    <i className="fas fa-calendar-alt mr-2 icon-secondary-blue"></i>
+                    Year
                   </FormLabel>
                   <FormControl>
-                    <Select 
-                      onValueChange={(value) => field.onChange(parseInt(value))} 
+                    <Select
+                      onValueChange={value => field.onChange(parseInt(value))}
                       value={field.value?.toString()}
                       data-testid="select-year"
                     >
@@ -206,7 +235,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                         <SelectValue placeholder="Select Year" />
                       </SelectTrigger>
                       <SelectContent>
-                        {years.map((year) => (
+                        {years.map(year => (
                           <SelectItem key={year} value={year.toString()}>
                             {year}
                           </SelectItem>
@@ -226,7 +255,8 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-tachometer-alt mr-2 text-primary"></i>Mileage
+                    <i className="fas fa-tachometer-alt mr-2 icon-secondary-blue"></i>
+                    Mileage
                   </FormLabel>
                   <div className="relative">
                     <FormControl>
@@ -234,14 +264,18 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                         type="number"
                         placeholder="e.g., 45000"
                         {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                        onChange={e =>
+                          field.onChange(parseInt(e.target.value) || 0)
+                        }
                         className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors pr-16 bg-background text-foreground"
                         min="0"
                         max="999999"
                         data-testid="input-mileage"
                       />
                     </FormControl>
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm font-medium">miles</span>
+                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm font-medium">
+                      miles
+                    </span>
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -255,7 +289,8 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-map-marker-alt mr-2 text-primary"></i>ZIP Code
+                    <i className="fas fa-map-marker-alt mr-2 icon-secondary-blue"></i>
+                    ZIP Code
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -267,7 +302,9 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                       data-testid="input-zipcode"
                     />
                   </FormControl>
-                  <p className="mt-1 text-xs text-muted-foreground">Used for regional market pricing</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Used for regional market pricing
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -277,20 +314,43 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
             <Button
               type="submit"
               disabled={valuationMutation.isPending}
-              className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:from-accent hover:to-primary transition-all duration-200 transform hover:scale-[1.02] focus:ring-4 focus:ring-primary/20"
+              className="btn-success-green w-full disabled:opacity-50 disabled:cursor-not-allowed"
               data-testid="button-submit-valuation"
             >
-              <i className="fas fa-search mr-2"></i>
-              {valuationMutation.isPending ? "Getting Valuation..." : "Get Vehicle Valuation"}
+              <i className="fas fa-car mr-3 icon-success"></i>
+              {valuationMutation.isPending ? (
+                <>
+                  <i className="fas fa-spinner fa-spin mr-2"></i>
+                  Getting Valuation...
+                </>
+              ) : (
+                "Get Vehicle Valuation"
+              )}
             </Button>
 
             {/* Disclaimer */}
-            <div className="bg-muted/20 rounded-xl p-4 border border-border">
+            <div className="bg-blue-subtle rounded-xl p-4">
               <div className="flex items-start space-x-3">
-                <i className="fas fa-info-circle text-primary mt-0.5"></i>
+                <i className="fas fa-info-circle icon-secondary-blue mt-0.5"></i>
                 <div className="text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground mb-1">Clean Vehicle Assumption</p>
-                  <p>Our valuation assumes your vehicle is in good condition without external damage. Actual values may vary based on vehicle condition and local market factors.</p>
+                  <p className="font-medium text-foreground mb-1">
+                    Clean Vehicle Assumption
+                  </p>
+                  <p>
+                    Our valuation assumes your vehicle is in good condition
+                    without external damage. Actual values may vary based on
+                    vehicle condition and local market factors.
+                  </p>
+                  <div className="mt-2 flex items-center space-x-4 text-xs">
+                    <div className="flex items-center space-x-1">
+                      <i className="fas fa-shield-alt icon-security"></i>
+                      <span>Secure & Trusted</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <i className="fas fa-database icon-data"></i>
+                      <span>Real-time Data</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

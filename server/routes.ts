@@ -157,6 +157,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Format address for Regrid API
         const addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
+
+        const searchPath = `/us/`
         const apiUrl = `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(addressQuery)}&limit=1`;
         
         console.log('Regrid API Request:', {
