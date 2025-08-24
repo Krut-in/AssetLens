@@ -1,0 +1,115 @@
+I am getting an assessment failed warning, 400 : { "message" : "Unable to find property for the provided address. Please verify your address details are correct."} Please help me resolve this error
+
+
+
+Also there's an important thing to note about the limitation of our api...
+
+
+
+List of Restricted Counties 
+
+ Are you on an API trial? 
+
+ If you are on an API trial token, you have access to a subset of Regrid's nationwide data. Data is returned by parcel record. For every returned parcel record counts towards your usage. 
+
+ API Trial Specifics 
+
+ What's Included for 
+
+ ONLY 
+
+ Trial users 
+
+ Overview 
+
+ Your free trial token will access a subset of data from our nationwide data set. This subset of data includes counties from rural, suburban and dense counties. You get access to all Premium attributes. 
+
+ * We have two level options for Standard and Premium attributes. 
+
+ What’s included in your 30 day free API trial 
+
+ You can access 2,000 parcels from any of the subset counties 
+
+ You can access 10,000 tiles from any of the subset counties 
+
+ You are able to try out all of our API endpoints with your trial token 
+
+ Data that’s included for sample counties 
+
+ Marion County, Indiana 
+
+ Dallas County, Texas 
+
+ Wilson County, Tennessee 
+
+ Durham County, North Carolina 
+
+ Fillmore County, Nebraska 
+
+ Clark County, Wisconsin 
+
+ Gurabo Municipio, Puerto Rico 
+
+ Additional Details regarding the 7 counties included for the API trial 
+
+ Counties 
+
+ Details 
+
+ FIPS Code 
+
+ Marion County, Indiana 
+
+ Population: 939,020 
+
+ Size: 397 square miles 
+
+ 18097 
+
+ Dallas County, Texas 
+
+ Population: 2,553,385 
+
+ Size: 909 square miles 
+
+ 48113 
+
+ Wilson County, Tennessee 
+
+ Population: 128,911 
+
+ Size: 571 square miles 
+
+ 47189 
+
+ Durham County, North Carolina 
+
+ Population: 300,952 
+
+ Size: 298 square miles 
+
+ 32063 
+
+ Fillmore County, Nebraska 
+
+ Population: 5,619 
+
+ Size: 576 square miles 
+
+ 31059 
+
+ Clark County, Wisconsin 
+
+ Population: 34,445 
+
+ Size: 1,219 square miles 
+
+ 55019 
+
+ Gurabo Municipio, Puerto Rico 
+
+ Population: 47,265 
+
+ Size: n/a 
+
+ 72063

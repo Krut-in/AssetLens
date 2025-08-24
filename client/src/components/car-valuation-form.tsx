@@ -109,11 +109,14 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
   };
 
   return (
-    <Card className="rounded-2xl shadow-lg border border-gray-100">
+    <Card className="rounded-2xl shadow-lg border border-border bg-card">
       <CardContent className="p-8">
         <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-secondary mb-2">Vehicle Information</h3>
-          <p className="text-text-secondary">Provide your car's details for accurate valuation</p>
+          <h3 className="text-2xl font-semibold text-foreground mb-2 flex items-center">
+            <i className="fas fa-car mr-3 text-primary"></i>
+            Vehicle Information
+          </h3>
+          <p className="text-muted-foreground">Enter your car details for instant AI-powered valuation</p>
         </div>
 
         <Form {...form}>
@@ -125,7 +128,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               name="make"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-text-primary flex items-center">
+                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
                     <i className="fas fa-industry mr-2 text-primary"></i>Make
                   </FormLabel>
                   <FormControl>
@@ -134,7 +137,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                       value={field.value}
                       data-testid="select-make"
                     >
-                      <SelectTrigger className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary transition-colors bg-white text-text-primary">
+                      <SelectTrigger className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground">
                         <SelectValue placeholder="Select Make" />
                       </SelectTrigger>
                       <SelectContent>
@@ -157,7 +160,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               name="model"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-text-primary flex items-center">
+                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
                     <i className="fas fa-car mr-2 text-primary"></i>Model
                   </FormLabel>
                   <FormControl>
@@ -167,7 +170,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                       disabled={!selectedMake}
                       data-testid="select-model"
                     >
-                      <SelectTrigger className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary transition-colors bg-white text-text-primary">
+                      <SelectTrigger className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground">
                         <SelectValue placeholder="Select Model" />
                       </SelectTrigger>
                       <SelectContent>
@@ -190,7 +193,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               name="year"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-text-primary flex items-center">
+                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
                     <i className="fas fa-calendar-alt mr-2 text-primary"></i>Year
                   </FormLabel>
                   <FormControl>
@@ -199,7 +202,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                       value={field.value?.toString()}
                       data-testid="select-year"
                     >
-                      <SelectTrigger className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary transition-colors bg-white text-text-primary">
+                      <SelectTrigger className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground">
                         <SelectValue placeholder="Select Year" />
                       </SelectTrigger>
                       <SelectContent>
@@ -222,7 +225,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               name="mileage"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-text-primary flex items-center">
+                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
                     <i className="fas fa-tachometer-alt mr-2 text-primary"></i>Mileage
                   </FormLabel>
                   <div className="relative">
@@ -232,13 +235,13 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                         placeholder="e.g., 45000"
                         {...field}
                         onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary transition-colors pr-16 text-text-primary"
+                        className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors pr-16 bg-background text-foreground"
                         min="0"
                         max="999999"
                         data-testid="input-mileage"
                       />
                     </FormControl>
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-text-secondary text-sm font-medium">miles</span>
+                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground text-sm font-medium">miles</span>
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -251,7 +254,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
               name="zipCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-text-primary flex items-center">
+                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
                     <i className="fas fa-map-marker-alt mr-2 text-primary"></i>ZIP Code
                   </FormLabel>
                   <FormControl>
@@ -260,11 +263,11 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
                       placeholder="e.g., 90210"
                       {...field}
                       maxLength={5}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-primary transition-colors text-text-primary"
+                      className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground"
                       data-testid="input-zipcode"
                     />
                   </FormControl>
-                  <p className="mt-1 text-xs text-text-secondary">Used for regional market pricing</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Used for regional market pricing</p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -274,7 +277,7 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
             <Button
               type="submit"
               disabled={valuationMutation.isPending}
-              className="w-full bg-gradient-to-r from-primary to-blue-600 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 transform hover:scale-[1.02] focus:ring-4 focus:ring-blue-200"
+              className="w-full bg-gradient-to-r from-primary to-accent text-primary-foreground py-4 px-6 rounded-xl font-semibold text-lg shadow-lg hover:from-accent hover:to-primary transition-all duration-200 transform hover:scale-[1.02] focus:ring-4 focus:ring-primary/20"
               data-testid="button-submit-valuation"
             >
               <i className="fas fa-search mr-2"></i>
@@ -282,11 +285,11 @@ export default function CarValuationForm({ onValuationComplete, onLoadingChange 
             </Button>
 
             {/* Disclaimer */}
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <div className="bg-muted/20 rounded-xl p-4 border border-border">
               <div className="flex items-start space-x-3">
                 <i className="fas fa-info-circle text-primary mt-0.5"></i>
-                <div className="text-sm text-text-secondary">
-                  <p className="font-medium text-text-primary mb-1">Clean Vehicle Assumption</p>
+                <div className="text-sm text-muted-foreground">
+                  <p className="font-medium text-foreground mb-1">Clean Vehicle Assumption</p>
                   <p>Our valuation assumes your vehicle is in good condition without external damage. Actual values may vary based on vehicle condition and local market factors.</p>
                 </div>
               </div>

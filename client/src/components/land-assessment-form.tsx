@@ -240,13 +240,34 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
               {assessmentMutation.isPending ? "Analyzing Property..." : "Get Land Assessment"}
             </Button>
 
-            {/* Disclaimer */}
-            <div className="bg-muted/20 rounded-xl p-4 border border-border">
+            {/* Trial Limitation Notice */}
+            <div className="bg-warning/20 rounded-xl p-4 border border-warning/40">
               <div className="flex items-start space-x-3">
-                <i className="fas fa-info-circle text-primary mt-0.5"></i>
-                <div className="text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground mb-1">Property Data Source</p>
-                  <p>Assessment data is sourced from public records via Regrid's comprehensive parcel database covering 156M+ properties nationwide.</p>
+                <i className="fas fa-exclamation-triangle text-warning mt-0.5"></i>
+                <div className="text-sm">
+                  <p className="font-medium text-foreground mb-2">Trial Limitation - Use Sample Addresses</p>
+                  <p className="text-muted-foreground mb-3">Our trial API token only works for these 7 counties. Please use addresses from:</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+                    <div className="bg-background rounded-lg p-2">
+                      <p className="font-medium text-foreground">Marion County, Indiana</p>
+                      <p className="text-muted-foreground">Try: Indianapolis, IN</p>
+                    </div>
+                    <div className="bg-background rounded-lg p-2">
+                      <p className="font-medium text-foreground">Dallas County, Texas</p>
+                      <p className="text-muted-foreground">Try: Dallas, TX</p>
+                    </div>
+                    <div className="bg-background rounded-lg p-2">
+                      <p className="font-medium text-foreground">Wilson County, Tennessee</p>
+                      <p className="text-muted-foreground">Try: Lebanon, TN</p>
+                    </div>
+                    <div className="bg-background rounded-lg p-2">
+                      <p className="font-medium text-foreground">Durham County, North Carolina</p>
+                      <p className="text-muted-foreground">Try: Durham, NC</p>
+                    </div>
+                  </div>
+                  <div className="mt-2 text-xs text-muted-foreground">
+                    <strong>Sample Address:</strong> 123 Main Street, Dallas, TX 75201
+                  </div>
                 </div>
               </div>
             </div>
