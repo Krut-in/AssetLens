@@ -9,6 +9,7 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, updates: Partial<InsertUser>): Promise<User>;
   
   // Asset management
   createUserAsset(asset: InsertUserAsset): Promise<UserAsset>;
@@ -51,6 +52,23 @@ export class DatabaseStorage implements IStorage {
     
     await db.insert(schema.users).values(user);
     return user;
+  }
+
+  async updateUser(id: string, updates: Partial<InsertUser>): Promise<User> {
+    const now = new Date();
+    
+    await db.update(schema.users)
+      .set({
+        ...updates,
+        updatedAt: now
+      })
+      .where(eq(schema.users.id, id));
+
+    const updatedUser = await this.getUser(id);
+    if (!updatedUser) {
+      throw new Error('User not found after update');
+    }
+    return updatedUser;
   }
 
   async createUserAsset(asset: InsertUserAsset): Promise<UserAsset> {

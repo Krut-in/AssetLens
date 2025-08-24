@@ -43,6 +43,11 @@ export async function setupVite(app: Express, server: Server) {
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
+    
+    // Skip API and auth routes
+    if (url.startsWith('/api/') || url.startsWith('/auth/')) {
+      return next();
+    }
 
     try {
       const clientTemplate = path.resolve(

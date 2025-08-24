@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import LandAssessmentForm from "../components/land-assessment-form";
 import LandAssessmentResults from "../components/land-assessment-results";
-import ThemeToggle from "../components/theme-toggle";
+import NavbarControls from "../components/navbar-controls";
 import type { LandAssessmentResponse } from "@shared/schema";
 
 export default function LandAssessment() {
@@ -71,15 +71,7 @@ export default function LandAssessment() {
                 </Link>
               </nav>
               <div className="hidden lg:flex items-center space-x-6">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <i className="fas fa-shield-alt text-accent"></i>
-                  <span>Secure & Trusted</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <i className="fas fa-database text-primary"></i>
-                  <span>156M+ Properties</span>
-                </div>
-                <ThemeToggle />
+                <NavbarControls />
               </div>
             </div>
           </div>

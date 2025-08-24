@@ -190,7 +190,7 @@ export default function LandAssessmentResults({
                 </div>
                 <div className="text-right">
                   <p
-                    className="text-2xl font-bold text-accent"
+                    className="text-2xl font-bold text-secondary"
                     data-testid="text-assessed-value"
                   >
                     {formatCurrency(data.result.assessedValue)}
@@ -210,7 +210,7 @@ export default function LandAssessmentResults({
                 </div>
                 <div className="text-right">
                   <p
-                    className="text-2xl font-bold text-warning"
+                    className="text-2xl font-bold text-yellow-700"
                     data-testid="text-land-value"
                   >
                     {formatCurrency(data.result.landValue)}
@@ -234,7 +234,7 @@ export default function LandAssessmentResults({
                     </div>
                     <div className="text-right">
                       <p
-                        className="text-2xl font-bold text-success"
+                        className="text-2xl font-bold text-blue-700"
                         data-testid="text-improvement-value"
                       >
                         {formatCurrency(data.result.improvementValue)}

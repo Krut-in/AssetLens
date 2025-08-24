@@ -1,10 +1,52 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import passport from "./auth";
 import { storage } from "./storage";
 import { insertValuationRequestSchema, insertLandAssessmentRequestSchema } from "@shared/schema";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  console.log('Registering authentication routes...');
+  
+  // Authentication routes
+  
+  // Google OAuth login
+  app.get('/auth/google', 
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+  );
+  console.log('Registered /auth/google route');
+
+  // Google OAuth callback
+  app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/' }),
+    (req, res) => {
+      // Successful authentication, redirect to dashboard
+      res.redirect('/dashboard');
+    }
+  );
+  console.log('Registered /auth/google/callback route');
+
+  // Logout
+  app.post('/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        return res.status(500).json({ message: 'Logout failed' });
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
+  });
+  console.log('Registered /auth/logout route');
+
+  // Get current user
+  app.get('/auth/me', (req, res) => {
+    if (req.isAuthenticated && req.isAuthenticated()) {
+      res.json({ user: req.user, isAuthenticated: true });
+    } else {
+      res.json({ user: null, isAuthenticated: false });
+    }
+  });
+  console.log('Registered /auth/me route');
+
   // Car valuation endpoint
   app.post("/api/valuation", async (req, res) => {
     try {

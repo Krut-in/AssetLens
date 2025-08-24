@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CarValuationForm from "../components/car-valuation-form";
 import ValuationResults from "../components/valuation-results";
-import ThemeToggle from "../components/theme-toggle";
+import NavbarControls from "../components/navbar-controls";
 import type { ValuationResponse } from "@shared/schema";
 
 export default function Home() {
@@ -72,15 +72,7 @@ export default function Home() {
                 </Link>
               </nav>
               <div className="hidden lg:flex items-center space-x-6">
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <i className="fas fa-shield-alt text-secondary"></i>
-                  <span>Secure & Trusted</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <i className="fas fa-clock text-primary"></i>
-                  <span>Real-time Data</span>
-                </div>
-                <ThemeToggle />
+                <NavbarControls />
               </div>
             </div>
           </div>
