@@ -155,16 +155,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call Regrid API for land assessment
       try {
-        // Format address for Regrid API - handle Google Places formatted addresses
-        let addressQuery;
-        if (validatedData.streetAddress.includes(',')) {
-          // Google Places formatted address - use as is
-          addressQuery = validatedData.streetAddress;
-        } else {
-          // Manual entry - combine fields
-          addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
-        }
+        // Format address for Regrid API
+        const addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
 
+        const searchPath = `/us/`
         const apiUrl = `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(addressQuery)}&limit=1`;
         
         console.log('Regrid API Request:', {
@@ -200,12 +194,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log('Regrid API Response:', {
           status: regridResponse.status,
           dataKeys: Object.keys(regridData),
-          parcels: regridData.parcels ? regridData.parcels.features?.length : 0,
+          features: regridData.features ? regridData.features.length : 0,
           error: regridData.error || null
         });
         
-        // Process Regrid response to extract property data - correct structure access
-        const features = regridData.parcels?.features || regridData.features || [];
+        // Process Regrid response to extract property data
+        const features = regridData.features || [];
         
         if (features.length === 0) {
           return res.status(400).json({ 
@@ -215,27 +209,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const property = features[0].properties;
         
-        console.log('Property data found:', {
-          assessval: property.assessval,
-          landval: property.landval,
-          improvval: property.improvval
-        });
-        
         // Extract property values from Regrid response
         const assessedValue = property.assessval || property.totval || 0;
         const landValue = property.landval || 0;
-        const improvementValue = property.improvval || property.impval || property.bldgval || 0;
+        const improvementValue = property.impval || property.bldgval || 0;
         const marketValue = assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue; // Estimate market value as 110% of assessed value
         const propertyType = property.usecd || property.zoning || property.landuse || 'Unknown';
-        const lotSize = property.ll_gisacre || property.acres || (property.sqft ? (property.sqft / 43560) : null); // Convert sqft to acres if available
+        const lotSize = property.acres || property.sqft ? (property.sqft / 43560) : null; // Convert sqft to acres if available
         const yearBuilt = property.yrbuilt || property.effyr || null;
-        
-        // Enhanced owner name extraction
-        const ownerName = property.owner || property.ownername || 
-                         (features[0].enhanced_ownership && features[0].enhanced_ownership[0] ? features[0].enhanced_ownership[0].eo_owner : null) || 
-                         null;
-        
-        const apn = property.parcelnumb || property.ll_gisacre || features[0].id || null;
+        const ownerName = property.owner || property.ownername || null;
+        const apn = property.parcelnumb || property.ll_gisacre || null;
 
         if (!assessedValue && !landValue && !improvementValue) {
           return res.status(400).json({ 
@@ -278,26 +261,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Land Assessment Error:', error);
       res.status(500).json({ 
         message: "An unexpected error occurred. Please try again later." 
-      });
-    }
-  });
-
-  // Maps configuration endpoint
-  app.get("/api/maps-config", async (req, res) => {
-    try {
-      const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-      
-      if (!apiKey) {
-        return res.status(500).json({ 
-          message: "Google Maps API key is not configured." 
-        });
-      }
-
-      res.json({ apiKey });
-    } catch (error) {
-      console.error('Maps Config Error:', error);
-      res.status(500).json({ 
-        message: "Unable to retrieve maps configuration." 
       });
     }
   });
