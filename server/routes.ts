@@ -157,15 +157,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Format address for Regrid API - handle Google Places formatted addresses
         console.log('Raw streetAddress from frontend:', validatedData.streetAddress);
+        console.log('City:', validatedData.city, 'State:', validatedData.state, 'ZipCode:', validatedData.zipCode);
         
         let addressQuery;
         if (validatedData.streetAddress.includes(',')) {
-          // Google Places formatted address - clean it up for Regrid API
-          addressQuery = validatedData.streetAddress
-            .replace(', USA', '') // Remove USA suffix
-            .replace(', United States', '') // Remove United States suffix
-            .trim();
-          console.log('Cleaned address for Regrid:', addressQuery);
+          // Google Places formatted address - extract just the street address portion
+          // Expected format: "701 Elm St, Dallas, TX 75202, USA"
+          const addressParts = validatedData.streetAddress.split(',');
+          const streetAddressOnly = addressParts[0].trim(); // Get just "701 Elm St"
+          
+          // Reconstruct using the parsed components for better accuracy
+          addressQuery = `${streetAddressOnly}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
+          console.log('Reconstructed address for Regrid:', addressQuery);
         } else {
           // Manual entry - combine fields
           addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
@@ -187,6 +190,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
 
         if (!regridResponse.ok) {
+          const errorText = await regridResponse.text();
+          console.error('Regrid API Error Response:', {
+            status: regridResponse.status,
+            statusText: regridResponse.statusText,
+            body: errorText,
+            addressQuery
+          });
+          
           if (regridResponse.status === 401) {
             return res.status(500).json({ 
               message: "Invalid Regrid API credentials. Please contact support." 
@@ -215,34 +226,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const features = regridData.parcels?.features || regridData.features || [];
         
         if (features.length === 0) {
-          return res.status(400).json({ 
-            message: "Unable to find property for the provided address. Please verify your address details are correct." 
+          // Try alternative address format if first attempt fails
+          console.log('First attempt failed, trying alternative address format...');
+          
+          let alternativeQuery;
+          if (validatedData.streetAddress.includes(',')) {
+            // Try with the full formatted address
+            alternativeQuery = validatedData.streetAddress
+              .replace(', USA', '')
+              .replace(', United States', '')
+              .trim();
+          } else {
+            // Try with just street address and state
+            alternativeQuery = `${validatedData.streetAddress}, ${validatedData.state}`;
+          }
+          
+          console.log('Trying alternative query:', alternativeQuery);
+          
+          const alternativeUrl = `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(alternativeQuery)}&limit=1`;
+          const alternativeResponse = await fetch(alternativeUrl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+            },
           });
+          
+          if (alternativeResponse.ok) {
+            const alternativeData = await alternativeResponse.json();
+            const alternativeFeatures = alternativeData.parcels?.features || alternativeData.features || [];
+            
+            if (alternativeFeatures.length > 0) {
+              console.log('Alternative query succeeded');
+              // Use the alternative result
+              regridData.parcels = { features: alternativeFeatures };
+            }
+          }
+          
+          // Re-check features after alternative attempt
+          const finalFeatures = regridData.parcels?.features || regridData.features || [];
+          if (finalFeatures.length === 0) {
+            return res.status(400).json({ 
+              message: "Unable to find property for the provided address. Please verify your address details are correct." 
+            });
+          }
         }
 
         const property = features[0].properties;
+        const fields = property.fields || {}; // Property values are in the 'fields' object
         
-        console.log('Property data found:', {
-          assessval: property.assessval,
-          landval: property.landval,
-          improvval: property.improvval
+        // Extract property values from Regrid response - values are in 'fields' object
+        const assessedValue = fields.parval || fields.assessval || fields.totval || 0;
+        const landValue = fields.landval || 0;
+        const improvementValue = fields.improvval || fields.impval || fields.bldgval || 0;
+        
+        console.log('Property fields found:', {
+          parval: fields.parval,
+          landval: fields.landval,
+          improvval: fields.improvval,
+          yearbuilt: fields.yearbuilt,
+          owner: fields.owner
         });
         
-        // Extract property values from Regrid response
-        const assessedValue = property.assessval || property.totval || 0;
-        const landValue = property.landval || 0;
-        const improvementValue = property.improvval || property.impval || property.bldgval || 0;
+        console.log('Calculated values:', {
+          assessedValue,
+          landValue,
+          improvementValue,
+          marketValue: assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue
+        });
         const marketValue = assessedValue > 0 ? Math.round(assessedValue * 1.1) : landValue + improvementValue; // Estimate market value as 110% of assessed value
-        const propertyType = property.usecd || property.zoning || property.landuse || 'Unknown';
-        const lotSize = property.ll_gisacre || property.acres || (property.sqft ? (property.sqft / 43560) : null); // Convert sqft to acres if available
-        const yearBuilt = property.yrbuilt || property.effyr || null;
+        const propertyType = fields.usedesc || fields.usecd || fields.zoning || property.zoning || 'Unknown';
+        const lotSize = fields.ll_gisacre || fields.acres || (fields.sqft ? (fields.sqft / 43560) : null); // Convert sqft to acres if available
+        const yearBuilt = fields.yearbuilt || fields.yrbuilt || fields.effyr || null;
         
         // Enhanced owner name extraction
-        const ownerName = property.owner || property.ownername || 
-                         (features[0].enhanced_ownership && features[0].enhanced_ownership[0] ? features[0].enhanced_ownership[0].eo_owner : null) || 
+        const ownerName = fields.owner || property.owner || fields.ownername || 
+                         (property.enhanced_ownership && property.enhanced_ownership[0] ? property.enhanced_ownership[0].eo_owner : null) || 
                          null;
         
-        const apn = property.parcelnumb || property.ll_gisacre || features[0].id || null;
+        const apn = fields.parcelnumb || fields.account_number || property.parcelnumb || features[0].id || null;
 
         if (!assessedValue && !landValue && !improvementValue) {
           return res.status(400).json({ 

@@ -102,7 +102,8 @@ export default function LandAssessmentForm({
   onLoadingChange,
 }: LandAssessmentFormProps) {
   const { toast } = useToast();
-  const [selectedLocation, setSelectedLocation] = useState<SelectedLocation | null>(null);
+  const [selectedLocation, setSelectedLocation] =
+    useState<SelectedLocation | null>(null);
 
   const form = useForm<InsertLandAssessmentRequest>({
     resolver: zodResolver(insertLandAssessmentRequestSchema),
@@ -154,13 +155,34 @@ export default function LandAssessmentForm({
     zipCode: string;
   }) => {
     setSelectedLocation(place);
-    // Auto-fill form fields - use the formatted address directly
-    form.setValue('streetAddress', place.address);
-    form.setValue('city', place.city);
-    form.setValue('state', place.state);
-    if (place.zipCode) {
-      form.setValue('zipCode', place.zipCode);
+    // Auto-fill form fields - extract street address only from formatted address
+    let streetAddressOnly = place.address;
+    if (place.address.includes(",")) {
+      // Extract just the street address part (before first comma)
+      streetAddressOnly = place.address.split(",")[0].trim();
     }
+
+    form.setValue("streetAddress", streetAddressOnly);
+    form.setValue("city", place.city);
+    // Find the state value that matches the state name or abbreviation
+    const stateValue =
+      states.find(
+        s =>
+          s.value === place.state ||
+          s.label.toLowerCase() === place.state.toLowerCase()
+      )?.value || place.state;
+    form.setValue("state", stateValue);
+    if (place.zipCode) {
+      form.setValue("zipCode", place.zipCode);
+    }
+
+    console.log("Place selected:", {
+      originalAddress: place.address,
+      streetAddressOnly,
+      city: place.city,
+      state: place.state,
+      zipCode: place.zipCode,
+    });
   };
 
   return (
@@ -179,162 +201,164 @@ export default function LandAssessmentForm({
           </div>
 
           <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6"
-            data-testid="form-land-assessment"
-          >
-            {/* Street Address Input with Google Places */}
-            <FormField
-              control={form.control}
-              name="streetAddress"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-home mr-2 icon-primary-green"></i>
-                    Street Address
-                  </FormLabel>
-                  <FormControl>
-                    <GooglePlacesInput
-                      value={field.value}
-                      onChange={field.onChange}
-                      onPlaceSelected={handlePlaceSelected}
-                      placeholder="e.g., 123 Main Street"
-                      className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* City Input */}
-            <FormField
-              control={form.control}
-              name="city"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-city mr-2 icon-primary-green"></i>City
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="e.g., San Francisco"
-                      {...field}
-                      className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground"
-                      data-testid="input-city"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* State Input */}
-            <FormField
-              control={form.control}
-              name="state"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium text-foreground flex items-center">
-                    <i className="fas fa-flag mr-2 icon-primary-green"></i>State
-                  </FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      data-testid="select-state"
-                    >
-                      <SelectTrigger className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground">
-                        <SelectValue placeholder="Select State" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {states.map(state => (
-                          <SelectItem key={state.value} value={state.value}>
-                            {state.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={assessmentMutation.isPending}
-              className="btn-success-green w-full disabled:opacity-50 disabled:cursor-not-allowed"
-              data-testid="button-submit-assessment"
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6"
+              data-testid="form-land-assessment"
             >
-              <i className="fas fa-map-marked-alt mr-3 icon-success"></i>
-              {assessmentMutation.isPending ? (
-                <>
-                  <i className="fas fa-spinner fa-spin mr-2"></i>
-                  Analyzing Property...
-                </>
-              ) : (
-                "Get Land Assessment"
-              )}
-            </Button>
+              {/* Street Address Input with Google Places */}
+              <FormField
+                control={form.control}
+                name="streetAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-foreground flex items-center">
+                      <i className="fas fa-home mr-2 icon-primary-green"></i>
+                      Street Address
+                    </FormLabel>
+                    <FormControl>
+                      <GooglePlacesInput
+                        value={field.value}
+                        onChange={field.onChange}
+                        onPlaceSelected={handlePlaceSelected}
+                        placeholder="e.g., 123 Main Street"
+                        className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Trial Limitation Notice */}
-            <div className="bg-blue-subtle rounded-xl p-4">
-              <div className="flex items-start space-x-3">
-                <i className="fas fa-info-circle icon-secondary-blue mt-0.5"></i>
-                <div className="text-sm">
-                  <p className="font-medium text-foreground mb-2">
-                    Trial Limitation - Use Sample Addresses
-                  </p>
-                  <p className="text-muted-foreground mb-3">
-                    Our trial API token only works for these 7 counties. Try
-                    these real addresses:
-                  </p>
-                  <div className="grid grid-cols-1 gap-2 text-xs">
-                    <div className="bg-card rounded-lg p-3 border border-border">
-                      <p className="font-medium text-accent">
-                        Dallas County, Texas
-                      </p>
-                      <p className="text-muted-foreground">
-                        701 Elm St, Dallas, TX
-                      </p>
-                    </div>
-                    <div className="bg-card rounded-lg p-3 border border-border">
-                      <p className="font-medium text-accent">
-                        Durham County, North Carolina
-                      </p>
-                      <p className="text-muted-foreground">
-                        101 City Hall Plaza, Durham, NC
-                      </p>
-                    </div>
-                    <div className="bg-card rounded-lg p-3 border border-border">
-                      <p className="font-medium text-accent">
-                        Wilson County, Tennessee
-                      </p>
-                      <p className="text-muted-foreground">
-                        1000 N Main St, Lebanon, TN
-                      </p>
-                    </div>
-                  </div>
-                  <div className="mt-3 p-2 bg-success-subtle rounded-lg">
-                    <p className="text-xs font-medium text-foreground">
-                      <i className="fas fa-star icon-success mr-2"></i>
-                      Recommended: 701 Elm St, Dallas, TX
+              {/* City Input */}
+              <FormField
+                control={form.control}
+                name="city"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-foreground flex items-center">
+                      <i className="fas fa-city mr-2 icon-primary-green"></i>
+                      City
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="e.g., San Francisco"
+                        {...field}
+                        className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground"
+                        data-testid="input-city"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* State Input */}
+              <FormField
+                control={form.control}
+                name="state"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-foreground flex items-center">
+                      <i className="fas fa-flag mr-2 icon-primary-green"></i>
+                      State
+                    </FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        data-testid="select-state"
+                      >
+                        <SelectTrigger className="w-full px-4 py-3 border-2 border-input rounded-xl focus:border-primary transition-colors bg-background text-foreground">
+                          <SelectValue placeholder="Select State" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {states.map(state => (
+                            <SelectItem key={state.value} value={state.value}>
+                              {state.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={assessmentMutation.isPending}
+                className="btn-success-green w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                data-testid="button-submit-assessment"
+              >
+                <i className="fas fa-map-marked-alt mr-3 icon-success"></i>
+                {assessmentMutation.isPending ? (
+                  <>
+                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                    Analyzing Property...
+                  </>
+                ) : (
+                  "Get Land Assessment"
+                )}
+              </Button>
+
+              {/* Trial Limitation Notice */}
+              <div className="bg-blue-subtle rounded-xl p-4">
+                <div className="flex items-start space-x-3">
+                  <i className="fas fa-info-circle icon-secondary-blue mt-0.5"></i>
+                  <div className="text-sm">
+                    <p className="font-medium text-foreground mb-2">
+                      Trial Limitation - Use Sample Addresses
                     </p>
+                    <p className="text-muted-foreground mb-3">
+                      Our trial API token only works for these 7 counties. Try
+                      these real addresses:
+                    </p>
+                    <div className="grid grid-cols-1 gap-2 text-xs">
+                      <div className="bg-card rounded-lg p-3 border border-border">
+                        <p className="font-medium text-accent">
+                          Dallas County, Texas
+                        </p>
+                        <p className="text-muted-foreground">
+                          701 Elm St, Dallas, TX
+                        </p>
+                      </div>
+                      <div className="bg-card rounded-lg p-3 border border-border">
+                        <p className="font-medium text-accent">
+                          Durham County, North Carolina
+                        </p>
+                        <p className="text-muted-foreground">
+                          101 City Hall Plaza, Durham, NC
+                        </p>
+                      </div>
+                      <div className="bg-card rounded-lg p-3 border border-border">
+                        <p className="font-medium text-accent">
+                          Wilson County, Tennessee
+                        </p>
+                        <p className="text-muted-foreground">
+                          1000 N Main St, Lebanon, TN
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 p-2 bg-success-subtle rounded-lg">
+                      <p className="text-xs font-medium text-foreground">
+                        <i className="fas fa-star icon-success mr-2"></i>
+                        Recommended: 701 Elm St, Dallas, TX
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </form>
-        </Form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
 
       {/* Map Section */}
-      <MiniMap 
+      <MiniMap
         lat={selectedLocation?.lat}
         lng={selectedLocation?.lng}
         address={selectedLocation?.address}
