@@ -157,16 +157,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Format address for Regrid API
         const addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
+        const apiUrl = `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(addressQuery)}&limit=1`;
         
-        const regridResponse = await fetch(
-          `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(addressQuery)}&limit=1`,
-          {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-            },
-          }
-        );
+        console.log('Regrid API Request:', {
+          addressQuery,
+          url: apiUrl.replace(apiToken, '[REDACTED]')
+        });
+        
+        const regridResponse = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        });
 
         if (!regridResponse.ok) {
           if (regridResponse.status === 401) {
@@ -185,6 +188,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         const regridData = await regridResponse.json();
+        
+        console.log('Regrid API Response:', {
+          status: regridResponse.status,
+          dataKeys: Object.keys(regridData),
+          features: regridData.features ? regridData.features.length : 0,
+          error: regridData.error || null
+        });
         
         // Process Regrid response to extract property data
         const features = regridData.features || [];

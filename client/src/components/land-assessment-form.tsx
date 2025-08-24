@@ -246,27 +246,27 @@ export default function LandAssessmentForm({ onAssessmentComplete, onLoadingChan
                 <i className="fas fa-exclamation-triangle text-warning mt-0.5"></i>
                 <div className="text-sm">
                   <p className="font-medium text-foreground mb-2">Trial Limitation - Use Sample Addresses</p>
-                  <p className="text-muted-foreground mb-3">Our trial API token only works for these 7 counties. Please use addresses from:</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-                    <div className="bg-background rounded-lg p-2">
-                      <p className="font-medium text-foreground">Marion County, Indiana</p>
-                      <p className="text-muted-foreground">Try: Indianapolis, IN</p>
-                    </div>
+                  <p className="text-muted-foreground mb-3">Our trial API token only works for these 7 counties. Try these real addresses:</p>
+                  <div className="grid grid-cols-1 gap-2 text-xs">
                     <div className="bg-background rounded-lg p-2">
                       <p className="font-medium text-foreground">Dallas County, Texas</p>
-                      <p className="text-muted-foreground">Try: Dallas, TX</p>
+                      <p className="text-muted-foreground">1500 Marilla Street, Dallas, TX 75201</p>
                     </div>
                     <div className="bg-background rounded-lg p-2">
-                      <p className="font-medium text-foreground">Wilson County, Tennessee</p>
-                      <p className="text-muted-foreground">Try: Lebanon, TN</p>
+                      <p className="font-medium text-foreground">Marion County, Indiana</p>
+                      <p className="text-muted-foreground">200 E Washington Street, Indianapolis, IN 46204</p>
                     </div>
                     <div className="bg-background rounded-lg p-2">
                       <p className="font-medium text-foreground">Durham County, North Carolina</p>
-                      <p className="text-muted-foreground">Try: Durham, NC</p>
+                      <p className="text-muted-foreground">101 City Hall Plaza, Durham, NC 27701</p>
+                    </div>
+                    <div className="bg-background rounded-lg p-2">
+                      <p className="font-medium text-foreground">Wilson County, Tennessee</p>
+                      <p className="text-muted-foreground">228 E Main Street, Lebanon, TN 37087</p>
                     </div>
                   </div>
                   <div className="mt-2 text-xs text-muted-foreground">
-                    <strong>Sample Address:</strong> 123 Main Street, Dallas, TX 75201
+                    <strong>Try This:</strong> 1500 Marilla Street, Dallas, TX 75201
                   </div>
                 </div>
               </div>
