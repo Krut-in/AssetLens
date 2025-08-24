@@ -113,6 +113,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Get full valuation response
         const valuationResponse = await storage.getValuationWithResult(request.id);
         
+        // For now, auto-create a user asset (in production, you'd have user authentication)
+        // We'll use a default user ID for demo purposes
+        const defaultUserId = "demo-user";
+        
+        // Create user if doesn't exist
+        let user = await storage.getUserByEmail("demo@example.com");
+        if (!user) {
+          user = await storage.createUser({
+            email: "demo@example.com",
+            name: "Demo User",
+            image: null,
+            googleId: null
+          });
+        }
+        
+        // Create user asset entry
+        await storage.createUserAsset({
+          userId: user.id,
+          assetType: "vehicle",
+          assetId: request.id,
+          customName: `${validatedData.year} ${validatedData.make} ${validatedData.model}`
+        });
+        
         res.json(valuationResponse);
       } catch (apiError) {
         console.error('MarketCheck API Error:', apiError);
@@ -328,6 +351,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Get full land assessment response
         const assessmentResponse = await storage.getLandAssessmentWithResult(request.id);
         
+        // Create user asset entry (using same demo user as vehicle)
+        let user = await storage.getUserByEmail("demo@example.com");
+        if (!user) {
+          user = await storage.createUser({
+            email: "demo@example.com",
+            name: "Demo User",
+            image: null,
+            googleId: null
+          });
+        }
+        
+        // Create user asset entry
+        await storage.createUserAsset({
+          userId: user.id,
+          assetType: "property",
+          assetId: request.id,
+          customName: `${validatedData.streetAddress}, ${validatedData.city}`
+        });
+        
         res.json(assessmentResponse);
       } catch (apiError) {
         console.error('Regrid API Error:', apiError);
@@ -367,6 +409,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ 
         message: "Unable to retrieve maps configuration." 
       });
+    }
+  });
+
+  // Dashboard endpoint to get user's asset portfolio
+  app.get("/api/dashboard", async (req, res) => {
+    try {
+      // For demo, use the same user we've been creating
+      const user = await storage.getUserByEmail("demo@example.com");
+      if (!user) {
+        // Return empty dashboard if no user exists yet
+        return res.json({
+          user: {
+            id: "demo",
+            email: "demo@example.com",
+            name: "Demo User",
+            image: null,
+            googleId: null,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          },
+          assets: [],
+          totalValue: "$0",
+          vehicleCount: 0,
+          propertyCount: 0
+        });
+      }
+
+      const dashboard = await storage.getUserDashboard(user.id);
+      res.json(dashboard);
+    } catch (error) {
+      console.error('Dashboard API Error:', error);
+      res.status(500).json({ message: "Unable to load dashboard data" });
     }
   });
 

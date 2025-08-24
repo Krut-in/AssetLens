@@ -11,46 +11,45 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // For now, we'll mock the data since we don't have auth yet
-    const mockDashboard: UserDashboard = {
-      user: {
-        id: "1",
-        email: "user@example.com",
-        name: "John Doe",
-        image: null,
-        googleId: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      assets: [
-        {
-          id: "1",
-          type: "vehicle",
-          name: "My Toyota Camry",
-          summary: "2020 Toyota Camry",
-          value: "$18,500",
-          createdAt: new Date(),
-          details: {} as any
-        },
-        {
-          id: "2",
-          type: "property",
-          name: "Dallas Property",
-          summary: "701 Elm St, Dallas, TX 75202",
-          value: "$11,626,032",
-          createdAt: new Date(),
-          details: {} as any
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch("/api/dashboard");
+        if (!response.ok) {
+          throw new Error("Failed to fetch dashboard data");
         }
-      ],
-      totalValue: "$11,644,532",
-      vehicleCount: 1,
-      propertyCount: 1
+        const dashboardData = await response.json();
+
+        // Convert date strings back to Date objects
+        dashboardData.assets = dashboardData.assets.map((asset: any) => ({
+          ...asset,
+          createdAt: new Date(asset.createdAt),
+        }));
+
+        setDashboard(dashboardData);
+      } catch (error) {
+        console.error("Error loading dashboard:", error);
+        // Fall back to empty dashboard
+        setDashboard({
+          user: {
+            id: "demo",
+            email: "demo@example.com",
+            name: "Demo User",
+            image: null,
+            googleId: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+          assets: [],
+          totalValue: "$0",
+          vehicleCount: 0,
+          propertyCount: 0,
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
-    
-    setTimeout(() => {
-      setDashboard(mockDashboard);
-      setIsLoading(false);
-    }, 1000);
+
+    fetchDashboardData();
   }, []);
 
   if (isLoading) {
@@ -60,8 +59,12 @@ export default function Dashboard() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
             <i className="fas fa-spinner fa-spin text-primary text-xl"></i>
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">Loading Dashboard</h3>
-          <p className="text-muted-foreground">Getting your asset portfolio...</p>
+          <h3 className="text-lg font-semibold text-foreground mb-2">
+            Loading Dashboard
+          </h3>
+          <p className="text-muted-foreground">
+            Getting your asset portfolio...
+          </p>
         </div>
       </div>
     );
@@ -112,17 +115,21 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Portfolio Value</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Portfolio Value
+              </CardTitle>
               <i className="fas fa-dollar-sign text-muted-foreground"></i>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-primary">{dashboard.totalValue}</div>
+              <div className="text-2xl font-bold text-primary">
+                {dashboard.totalValue}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {dashboard.assets.length} total assets
               </p>
             </CardContent>
           </Card>
-          
+
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Vehicles</CardTitle>
@@ -142,7 +149,9 @@ export default function Dashboard() {
               <i className="fas fa-home text-muted-foreground"></i>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{dashboard.propertyCount}</div>
+              <div className="text-2xl font-bold">
+                {dashboard.propertyCount}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Property assessments
               </p>
@@ -151,7 +160,9 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Combined Report</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Combined Report
+              </CardTitle>
               <i className="fas fa-file-pdf text-muted-foreground"></i>
             </CardHeader>
             <CardContent>
@@ -188,7 +199,9 @@ export default function Dashboard() {
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-muted/20 rounded-full mb-4">
                   <i className="fas fa-plus text-muted-foreground text-xl"></i>
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2">No Assets Yet</h3>
+                <h3 className="text-lg font-semibold text-foreground mb-2">
+                  No Assets Yet
+                </h3>
                 <p className="text-muted-foreground mb-4">
                   Start by adding your first vehicle or property assessment.
                 </p>
@@ -207,20 +220,39 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-4">
-                {dashboard.assets.map((asset) => (
-                  <div key={asset.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                {dashboard.assets.map(asset => (
+                  <div
+                    key={asset.id}
+                    className="flex items-center justify-between p-4 border border-border rounded-lg"
+                  >
                     <div className="flex items-center space-x-4">
-                      <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                        asset.type === 'vehicle' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'
-                      }`}>
-                        <i className={`fas ${asset.type === 'vehicle' ? 'fa-car' : 'fa-home'} text-lg`}></i>
+                      <div
+                        className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                          asset.type === "vehicle"
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-green-100 text-green-600"
+                        }`}
+                      >
+                        <i
+                          className={`fas ${
+                            asset.type === "vehicle" ? "fa-car" : "fa-home"
+                          } text-lg`}
+                        ></i>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-foreground">{asset.name}</h4>
-                        <p className="text-sm text-muted-foreground">{asset.summary}</p>
+                        <h4 className="font-semibold text-foreground">
+                          {asset.name}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          {asset.summary}
+                        </p>
                         <div className="flex items-center space-x-2 mt-1">
-                          <Badge variant={asset.type === 'vehicle' ? 'default' : 'secondary'}>
-                            {asset.type === 'vehicle' ? 'Vehicle' : 'Property'}
+                          <Badge
+                            variant={
+                              asset.type === "vehicle" ? "default" : "secondary"
+                            }
+                          >
+                            {asset.type === "vehicle" ? "Vehicle" : "Property"}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
                             Added {asset.createdAt.toLocaleDateString()}
@@ -229,7 +261,9 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-xl font-bold text-primary">{asset.value}</div>
+                      <div className="text-xl font-bold text-primary">
+                        {asset.value}
+                      </div>
                       <Button variant="ghost" size="sm">
                         <i className="fas fa-eye mr-1"></i>View Details
                       </Button>
@@ -244,9 +278,9 @@ export default function Dashboard() {
         {/* Combined Report Section */}
         {dashboard.assets.length > 0 && (
           <div className="mt-8">
-            <CombinedReport 
-              assets={dashboard.assets} 
-              totalValue={dashboard.totalValue} 
+            <CombinedReport
+              assets={dashboard.assets}
+              totalValue={dashboard.totalValue}
             />
           </div>
         )}
