@@ -106,7 +106,7 @@ export default function MiniMap({ lat, lng, address, className }: MiniMapProps) 
         <div className="relative">
           <div
             ref={mapRef}
-            className="w-full h-64 rounded-lg overflow-hidden bg-gray-100"
+            className="w-full h-80 rounded-lg overflow-hidden bg-gray-100"
           />
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-lg">

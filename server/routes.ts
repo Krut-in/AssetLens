@@ -155,8 +155,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Call Regrid API for land assessment
       try {
-        // Format address for Regrid API
-        const addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
+        // Format address for Regrid API - use only the street address if it's already formatted by Google Places
+        let addressQuery;
+        if (validatedData.streetAddress.includes(',')) {
+          // Google Places formatted address - use as is
+          addressQuery = validatedData.streetAddress;
+        } else {
+          // Manual entry - combine fields
+          addressQuery = `${validatedData.streetAddress}, ${validatedData.city}, ${validatedData.state}${validatedData.zipCode ? ' ' + validatedData.zipCode : ''}`;
+        }
 
         const searchPath = `/us/`
         const apiUrl = `https://app.regrid.com/api/v2/parcels/address?token=${apiToken}&query=${encodeURIComponent(addressQuery)}&limit=1`;
@@ -195,19 +202,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
           status: regridResponse.status,
           dataKeys: Object.keys(regridData),
           features: regridData.features ? regridData.features.length : 0,
-          error: regridData.error || null
+          parcels: regridData.parcels ? regridData.parcels.length : 0,
+          error: regridData.error || null,
+          fullResponse: JSON.stringify(regridData, null, 2)
         });
         
         // Process Regrid response to extract property data
-        const features = regridData.features || [];
+        const parcels = regridData.parcels || regridData.features || [];
         
-        if (features.length === 0) {
+        console.log('Regrid parcels found:', parcels.length);
+        
+        if (parcels.length === 0) {
           return res.status(400).json({ 
             message: "Unable to find property for the provided address. Please verify your address details are correct." 
           });
         }
 
-        const property = features[0].properties;
+        const property = parcels[0].properties || parcels[0];
         
         // Extract property values from Regrid response
         const assessedValue = property.assessval || property.totval || 0;

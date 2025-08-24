@@ -154,7 +154,8 @@ export default function LandAssessmentForm({
     zipCode: string;
   }) => {
     setSelectedLocation(place);
-    // Auto-fill form fields
+    // Auto-fill form fields - use the formatted address directly
+    form.setValue('streetAddress', place.address);
     form.setValue('city', place.city);
     form.setValue('state', place.state);
     if (place.zipCode) {
